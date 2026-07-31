@@ -42,6 +42,9 @@ js/
   util/                  date.js, format.js, dom.js
   ui/                    modal.js, toast.js
   views/                 satu modul per section di halaman
+  sync/                  credentials.js, client.js, sync.js (opsional)
+supabase/
+  schema.sql             tabel + Row Level Security
 ```
 
 ### Pola yang dipakai
@@ -145,9 +148,64 @@ naikkan `VERSION` (`v2` → `v3`) agar cache lama dibuang.
 
 ---
 
+## Sinkronisasi lintas perangkat
+
+Opsional. Selama belum dikonfigurasi, aplikasi berjalan penuh dengan data lokal
+saja dan `supabase-js` **tidak diunduh sama sekali**.
+
+### Cara kerja
+
+localStorage tetap sumber kebenaran lokal; Supabase hanya lapisan di atasnya.
+Seluruh state disimpan sebagai **satu baris JSON per pengguna** — pilihan sadar:
+untuk pemakaian pribadi di dua-tiga perangkat ini jauh lebih sederhana daripada
+memecah tiap entitas jadi tabel.
+
+Konsekuensinya perubahan bersamaan tidak bisa digabung otomatis. Yang terjadi:
+
+| Kondisi | Tindakan |
+|---|---|
+| Server belum punya data | Kirim data perangkat ini |
+| Server berubah, lokal tidak | Ambil versi server |
+| Lokal berubah, server tidak | Kirim perubahan |
+| Keduanya berubah | **Tanya** — pilih versi server atau versi perangkat ini |
+
+Push otomatis 4 detik setelah perubahan terakhir. Pull otomatis saat aplikasi
+dibuka, saat kembali dari background, dan saat koneksi pulih.
+
+### Pengaturan
+
+1. Buat project gratis di <https://supabase.com/dashboard>.
+
+2. **SQL Editor → New query** → tempel isi [`supabase/schema.sql`](supabase/schema.sql) → **Run**.
+   Ini membuat tabel `app_state` sekaligus mengaktifkan Row Level Security.
+
+3. **Authentication → URL Configuration**:
+   - *Site URL*: `https://rizalzein.github.io/Gaming-HQ/`
+   - *Redirect URLs*: tambahkan juga `http://localhost:8123/` untuk pengembangan lokal.
+
+   Tanpa langkah ini, tautan magic link akan ditolak.
+
+4. **Project Settings → API**, salin *Project URL* dan *anon public key* ke
+   [`js/sync/credentials.js`](js/sync/credentials.js).
+
+5. Commit dan push. Setelah Pages selesai build, buka bagian **◈ 09
+   Sinkronisasi**, masukkan email, klik tautan yang masuk. Ulangi di perangkat
+   lain dengan **email yang sama**.
+
+### Catatan keamanan
+
+*Anon key* memang dirancang untuk ditempel di klien dan boleh terlihat publik —
+yang menjaga data adalah kebijakan RLS di `schema.sql`, bukan kerahasiaan key.
+Karena itu langkah 2 tidak boleh dilewati: tanpa RLS aktif, siapa pun yang
+membuka repo bisa membaca dan menulis tabel itu.
+
+Jangan pernah menaruh *service role key* di `credentials.js` — key tersebut
+melewati semua kebijakan RLS.
+
+---
+
 ## Rencana lanjutan
 
-- Sinkronisasi lintas perangkat (Supabase / Firebase) supaya data sama di HP dan
-  PC tanpa backup manual — saat ini data terpisah per perangkat.
 - Notifikasi pengingat sebelum reset harian.
 - Riwayat streak dalam bentuk heatmap.
+- Halaman ringkasan bulanan (total top-up, streak terpanjang, pity terpakai).

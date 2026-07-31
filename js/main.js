@@ -10,8 +10,11 @@ import * as patches  from './views/patches.js';
 import * as story    from './views/story.js';
 import * as pity     from './views/pity.js';
 import * as settings from './views/settings.js';
+import * as syncView from './views/sync.js';
 
-const views = [header, roster, tasks, events, budget, patches, story, pity, settings];
+import { init as initSync, onSyncChange } from './sync/sync.js';
+
+const views = [header, roster, tasks, events, budget, patches, story, pity, settings, syncView];
 
 const actions = Object.assign({}, ...views.map(v => v.actions ?? {}));
 const changes = Object.assign({}, ...views.map(v => v.changes ?? {}));
@@ -27,6 +30,7 @@ function render(){
   story.renderStory();
   pity.renderPity();
   settings.renderSettings();
+  syncView.renderSync();
 }
 
 /* ---- Event delegation: satu listener untuk seluruh app ---- */
@@ -62,6 +66,11 @@ const { migrated } = load();
 render();
 
 if (migrated) toast('Data lama berhasil dimigrasi ke format baru.');
+
+// Sinkronisasi opsional — kalau Supabase belum dikonfigurasi, ini tidak
+// melakukan apa pun dan tidak mengunduh apa pun.
+onSyncChange(syncView.renderSync);
+initSync().catch(err => console.warn('Sync gagal inisialisasi:', err));
 
 // Hitung mundur reset dan pergantian hari-game.
 setInterval(() => {

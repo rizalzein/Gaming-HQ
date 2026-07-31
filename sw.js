@@ -2,9 +2,9 @@
  * Service worker offline-first.
  * Naikkan VERSION setiap kali file di PRECACHE berubah agar klien mengambil versi baru.
  */
-const VERSION = 'v2';
+const VERSION = 'v3';
 const CACHE   = `markas-gacha-${VERSION}`;
-const FONTS   = `markas-gacha-fonts`;
+const VENDOR  = `markas-gacha-vendor`;   // font + supabase-js dari CDN
 
 const PRECACHE = [
   './',
@@ -32,6 +32,10 @@ const PRECACHE = [
   'js/views/story.js',
   'js/views/pity.js',
   'js/views/settings.js',
+  'js/views/sync.js',
+  'js/sync/credentials.js',
+  'js/sync/client.js',
+  'js/sync/sync.js',
 ];
 
 self.addEventListener('install', event => {
@@ -46,7 +50,7 @@ self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys()
       .then(keys => Promise.all(
-        keys.filter(k => k !== CACHE && k !== FONTS).map(k => caches.delete(k))
+        keys.filter(k => k !== CACHE && k !== VENDOR).map(k => caches.delete(k))
       ))
       .then(() => self.clients.claim())
   );
@@ -58,11 +62,18 @@ self.addEventListener('fetch', event => {
 
   const url = new URL(request.url);
 
-  // Font Google: cache-first permanen, supaya tampilan tetap utuh saat offline.
-  if (url.hostname.endsWith('googleapis.com') || url.hostname.endsWith('gstatic.com')){
-    event.respondWith(cacheFirst(request, FONTS));
+  // Dependensi pihak ketiga (font Google, supabase-js dari esm.sh): cache-first
+  // permanen. Semuanya ber-versi di URL-nya, jadi aman disimpan selamanya dan
+  // tampilan tetap utuh saat offline.
+  if (url.hostname.endsWith('googleapis.com') ||
+      url.hostname.endsWith('gstatic.com') ||
+      url.hostname === 'esm.sh'){
+    event.respondWith(cacheFirst(request, VENDOR));
     return;
   }
+
+  // Permintaan ke Supabase tidak boleh disentuh cache sama sekali.
+  if (url.pathname.startsWith('/auth/') || url.pathname.startsWith('/rest/')) return;
 
   if (url.origin !== self.location.origin) return;
 
