@@ -85,6 +85,9 @@ document.addEventListener('visibilitychange', () => {
 
 if ('serviceWorker' in navigator && location.protocol.startsWith('http')){
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('sw.js').catch(err => console.warn('SW gagal daftar:', err));
+    // updateViaCache:'none' — jangan ambil sw.js dari HTTP cache saat mengecek
+    // pembaruan, supaya versi baru terdeteksi segera setelah deploy.
+    navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' })
+      .catch(err => console.warn('SW gagal daftar:', err));
   });
 }

@@ -142,6 +142,12 @@ Service worker memakai **network-first** untuk file aplikasi: selama online,
 browser selalu mengambil versi terbaru, dan cache hanya dipakai sebagai jaring
 pengaman saat offline. Jadi update langsung terpakai tanpa langkah tambahan.
 
+GitHub Pages mengirim `Cache-Control: max-age=600`, jadi tanpa penanganan khusus
+browser bisa menyajikan modul lama sampai 10 menit setelah deploy — dan
+mencampurnya dengan modul baru. Karena itu service worker mengambil file dengan
+`cache: 'no-cache'` (revalidasi ke server, balasan 304 kalau tidak berubah), dan
+`sw.js` sendiri didaftarkan dengan `updateViaCache: 'none'`.
+
 Yang tetap perlu diperbarui: kalau **menambah atau mengganti nama file**, masukkan
 ke daftar `PRECACHE` di `sw.js` supaya file itu ikut tersedia offline, lalu
 naikkan `VERSION` (`v2` → `v3`) agar cache lama dibuang.

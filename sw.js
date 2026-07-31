@@ -2,7 +2,7 @@
  * Service worker offline-first.
  * Naikkan VERSION setiap kali file di PRECACHE berubah agar klien mengambil versi baru.
  */
-const VERSION = 'v3';
+const VERSION = 'v4';
 const CACHE   = `markas-gacha-${VERSION}`;
 const VENDOR  = `markas-gacha-vendor`;   // font + supabase-js dari CDN
 
@@ -103,7 +103,11 @@ async function cacheFirst(request, cacheName){
 async function networkFirst(request, cacheName){
   const cache = await caches.open(cacheName);
   try {
-    const res = await fetch(request);
+    // cache:'no-cache' memaksa revalidasi ke server. GitHub Pages mengirim
+    // Cache-Control: max-age=600, jadi tanpa ini browser bisa menyajikan modul
+    // lama sampai 10 menit setelah deploy — dan mencampurnya dengan modul baru.
+    // Revalidasi tetap murah karena server membalas 304 kalau tidak berubah.
+    const res = await fetch(request, { cache: 'no-cache' });
     if (res.ok) cache.put(request, res.clone());
     return res;
   } catch (err){
