@@ -1,6 +1,12 @@
 /* Reset, layout dasar, tipografi, dan elemen form generik. */
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 
+/* Atribut hidden harus selalu menang. Aturan display apa pun dari penulis
+   (misalnya .modal-root{display:grid}) mengalahkan [hidden]{display:none}
+   bawaan browser — akibatnya elemen yang mestinya tersembunyi tetap tampil
+   dan, kalau posisinya fixed dan menutupi layar, menelan semua klik. */
+[hidden]{display:none!important}
+
 body{
   font-family:var(--font-body);
   background:
