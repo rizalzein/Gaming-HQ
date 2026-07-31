@@ -100,18 +100,27 @@ ikut dimigrasi.
 
 Tidak ada build step, jadi isi repo langsung bisa disajikan apa adanya.
 
-1. Buat repo di GitHub, lalu:
+1. Buat repo kosong bernama `Gaming-HQ` di <https://github.com/new> — **publik**,
+   tanpa README / .gitignore / license (repo lokal sudah punya riwayatnya).
+
+2. Hubungkan dan kirim:
 
    ```bash
-   git remote add origin https://github.com/<user>/markas-gacha.git
+   git remote add origin https://github.com/<user>/Gaming-HQ.git
    git push -u origin main
    ```
 
-2. Di repo → **Settings → Pages** → *Source*: `Deploy from a branch`,
+   Push pertama akan membuka jendela login GitHub (Git Credential Manager).
+   Setelah itu kredensialnya tersimpan.
+
+3. Di repo → **Settings → Pages** → *Source*: `Deploy from a branch`,
    *Branch*: `main` / `/ (root)` → **Save**.
 
-3. Tunggu satu-dua menit, situsnya muncul di
-   `https://<user>.github.io/markas-gacha/`.
+4. Tunggu satu-dua menit, situsnya muncul di
+   `https://<user>.github.io/Gaming-HQ/`.
+
+File `.nojekyll` sudah disertakan agar GitHub Pages menyajikan berkas apa adanya
+tanpa memproses lewat Jekyll.
 
 Semua path di project ini relatif (`./`, `css/…`, `js/…`), jadi aplikasinya
 berfungsi di subfolder tanpa penyesuaian.
