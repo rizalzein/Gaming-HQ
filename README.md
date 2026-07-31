@@ -119,17 +119,20 @@ berfungsi di subfolder tanpa penyesuaian.
 Buka URL itu di HP → menu browser → **Install app** / **Add to Home Screen**.
 Setelah terpasang, aplikasinya jalan offline dan punya ikonnya sendiri.
 
-> Repo publik berarti isi seed di `js/config.js` ikut terbaca publik — di
-> dalamnya ada catatan pribadi (nominal pelunasan, jadwal perjalanan). Bersihkan
-> `SEED_EVENTS` dan `SEED_HOLIDAY` sebelum push ke repo publik, atau pakai repo
-> privat. Data yang sudah Anda isi sendiri tetap aman: itu ada di browser, tidak
-> pernah masuk repo.
+> Seed di `js/config.js` sengaja dijaga bebas data pribadi — isinya hanya jadwal
+> game yang memang publik. Agenda, nominal, posisi story, dan tanggal liburan
+> diisi lewat UI dan tersimpan di browser, tidak pernah masuk repo. Jaga
+> pemisahan ini kalau nanti mengubah seed.
 
 ### Setelah mengubah file
 
-`sw.js` menyimpan daftar file di `PRECACHE`. Kalau menambah atau mengganti nama
-file, perbarui daftar itu **dan** naikkan `VERSION` (`v1` → `v2`) agar browser
-mengambil versi baru, bukan yang tersimpan di cache.
+Service worker memakai **network-first** untuk file aplikasi: selama online,
+browser selalu mengambil versi terbaru, dan cache hanya dipakai sebagai jaring
+pengaman saat offline. Jadi update langsung terpakai tanpa langkah tambahan.
+
+Yang tetap perlu diperbarui: kalau **menambah atau mengganti nama file**, masukkan
+ke daftar `PRECACHE` di `sw.js` supaya file itu ikut tersedia offline, lalu
+naikkan `VERSION` (`v2` → `v3`) agar cache lama dibuang.
 
 ---
 

@@ -64,11 +64,10 @@ export const SEED_PRIORITIES = {
   zzz: 0, genshin: 0, endfield: 1, wuwa: 1, hsr: 1, nte: 2, sla: 2, hi3: 2,
 };
 
+// Contoh isi untuk pemasangan baru. Agenda pribadi tidak ditaruh di sini —
+// tambahkan lewat UI supaya tersimpan di browser, bukan ikut masuk repo.
 export const SEED_EVENTS = [
-  { name:'💰 PELUNASAN BANYUWANGI Rp 7,17 jt ke Mas Adi', game:'',        date:'2026-08-01', money:true },
-  { name:'✈️ Berangkat Banyuwangi (kereta malam)',        game:'',        date:'2026-08-02' },
   { name:'HSR 4.4 Phase 2 — Cerydra, Anaxa, Aventurine rerun', game:'hsr', date:'2026-08-05' },
-  { name:'🏠 Pulang — kereta 15:00',                       game:'',        date:'2026-08-06' },
   { name:'ZZZ: klaim selector S-Rank + 1.600 Polychrome + 20 Signal Search', game:'zzz', date:'2026-08-07' },
   { name:'HSR: klaim Gilgamesh/Archer gratis (kalau belum)', game:'hsr',   date:'2026-08-07' },
   { name:'Endfield: banner Arcane tutup → Phase 2 Liino mulai', game:'endfield', date:'2026-08-09' },
@@ -89,22 +88,15 @@ export const SEED_PATCHES = [
   { game:'zzz',      label:'ZZZ 3.2',                    date:'±9 Sep' },
 ];
 
-export const SEED_STORY = {
-  endfield: 'Ruins in the Miasma — Ch. II, Process VII',
-  genshin : 'Sumeru Ch. II — Truth Amongst the Pages of Purana',
-  wuwa    : 'Lahai-Roi Ch. III — Segue (To the Stars Yet to Shine)',
-  hsr     : 'Act III: Finality I — Memories are the Prelude to Dreams',
-  zzz     : 'S1 Bury Your Tears · S2 Ch.1 Where Clouds Embrace the Dawn',
-  nte     : 'Fighting with a Dragon — Fated Riddle',
-  sla     : 'Expert Ch. 18 — Almighty Shaman, Kargalgan (EP 07)',
-  hi3     : 'Part 2, Ch. X — Reunited Under the Light of Faith',
-};
+// Posisi story diisi sendiri lewat ◈ 06 — sengaja dikosongkan agar progres
+// pribadi tidak tersimpan di dalam kode.
+export const SEED_STORY = {};
 
 export const SEED_HOLIDAY = {
   mode : null,            // null = ikut tanggal, true/false = paksa on/off
-  label: 'Banyuwangi',
-  start: '2026-08-02',
-  end  : '2026-08-06',
+  label: '',
+  start: '',
+  end  : '',
   tips : [
     'Game prioritas rendah — login + claim, jangan main',
     'Game utama — buka, klaim daily, tutup',

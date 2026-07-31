@@ -2,7 +2,7 @@
  * Service worker offline-first.
  * Naikkan VERSION setiap kali file di PRECACHE berubah agar klien mengambil versi baru.
  */
-const VERSION = 'v1';
+const VERSION = 'v2';
 const CACHE   = `markas-gacha-${VERSION}`;
 const FONTS   = `markas-gacha-fonts`;
 
@@ -74,7 +74,10 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  event.respondWith(staleWhileRevalidate(request, CACHE));
+  // File app sendiri: network-first. Cache hanya jadi jaring pengaman offline.
+  // Kalau memakai cache-first, satu file lama bisa tercampur dengan file baru
+  // setelah deploy — dan perubahan saat ngoding tidak langsung terlihat.
+  event.respondWith(networkFirst(request, CACHE));
 });
 
 async function cacheFirst(request, cacheName){
@@ -86,14 +89,15 @@ async function cacheFirst(request, cacheName){
   return res;
 }
 
-async function staleWhileRevalidate(request, cacheName){
+async function networkFirst(request, cacheName){
   const cache = await caches.open(cacheName);
-  const hit = await cache.match(request);
-  const network = fetch(request)
-    .then(res => {
-      if (res.ok) cache.put(request, res.clone());
-      return res;
-    })
-    .catch(() => hit);
-  return hit || network;
+  try {
+    const res = await fetch(request);
+    if (res.ok) cache.put(request, res.clone());
+    return res;
+  } catch (err){
+    const hit = await cache.match(request);
+    if (hit) return hit;
+    throw err;
+  }
 }

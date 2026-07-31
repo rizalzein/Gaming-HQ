@@ -29,7 +29,7 @@ function renderMisc(){
   setHTML('settings-misc', `
     <div class="setbox">
       <h4>Mode liburan</h4>
-      <div class="setrow"><label>Nama</label><input value="${esc(h.label)}" data-change="holiday:label" placeholder="Misal: Banyuwangi"></div>
+      <div class="setrow"><label>Nama</label><input value="${esc(h.label)}" data-change="holiday:label" placeholder="Misal: mudik, liburan kantor"></div>
       <div class="setrow"><label>Mulai</label><input type="date" value="${esc(h.start)}" data-change="holiday:start"></div>
       <div class="setrow"><label>Selesai</label><input type="date" value="${esc(h.end)}" data-change="holiday:end"></div>
       <div class="note" style="margin-top:4px">Status sekarang: <b>${esc(modeText)}</b>.
