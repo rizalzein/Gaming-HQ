@@ -138,15 +138,29 @@ Setelah terpasang, aplikasinya jalan offline dan punya ikonnya sendiri.
 
 ### Setelah mengubah file
 
-Service worker memakai **network-first** untuk file aplikasi: selama online,
-browser selalu mengambil versi terbaru, dan cache hanya dipakai sebagai jaring
-pengaman saat offline. Jadi update langsung terpakai tanpa langkah tambahan.
+**Perubahan butuh waktu sampai 10 menit untuk terlihat.** GitHub Pages mengirim
+`Cache-Control: max-age=600` dan headernya tidak bisa diatur. Selama entri itu
+masih segar, browser menyajikan berkas dari HTTP cache-nya sendiri — dan
+permintaan itu **tidak pernah sampai ke service worker**, jadi tidak ada strategi
+caching di `sw.js` yang bisa menambalnya. Terukur lewat Resource Timing:
+`workerStart: 0`, `deliveryType: "cache"`, `transferSize: 0`.
 
-GitHub Pages mengirim `Cache-Control: max-age=600`, jadi tanpa penanganan khusus
-browser bisa menyajikan modul lama sampai 10 menit setelah deploy — dan
-mencampurnya dengan modul baru. Karena itu service worker mengambil file dengan
-`cache: 'no-cache'` (revalidasi ke server, balasan 304 kalau tidak berubah), dan
-`sw.js` sendiri didaftarkan dengan `updateViaCache: 'none'`.
+Konsekuensi yang perlu diingat: sesaat setelah deploy, satu berkas lama bisa
+tercampur dengan berkas baru dalam satu halaman.
+
+Cara memaksa versi terbaru saat menguji:
+
+- **Ctrl+Shift+R** (hard reload) — melewati HTTP cache.
+- Atau tunggu 10 menit; setelah itu sendirinya segar.
+
+Service worker tetap memakai network-first dengan `cache: 'no-cache'`, dan
+`sw.js` didaftarkan dengan `updateViaCache: 'none'`. Keduanya membantu untuk
+permintaan yang memang sampai ke service worker — sekadar bukan obat untuk
+kasus di atas.
+
+Kalau penundaan ini mengganggu, pindah ke **Cloudflare Pages** menyelesaikannya:
+di sana berkas `_headers` bisa memaksa `Cache-Control: no-cache` untuk `js/` dan
+`css/`, sesuatu yang tidak mungkin di GitHub Pages.
 
 Yang tetap perlu diperbarui: kalau **menambah atau mengganti nama file**, masukkan
 ke daftar `PRECACHE` di `sw.js` supaya file itu ikut tersedia offline, lalu
