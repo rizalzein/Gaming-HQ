@@ -20,6 +20,13 @@ const META_KEY  = 'markas-gacha:sync';
 const TABLE     = 'app_state';
 const PUSH_DELAY = 4000;
 
+/**
+ * SMTP bawaan Supabase hanya mengizinkan beberapa email per jam, dan tiap
+ * percobaan yang ditolak ikut memperpanjang jedanya. Tanpa penahan di sisi UI,
+ * klik beruntun membakar kuota itu dalam hitungan detik.
+ */
+const OTP_COOLDOWN_MS = 60_000;
+
 /** state: 'off' | 'signedout' | 'idle' | 'working' | 'ok' | 'error' | 'conflict' */
 let status = { state: 'off', message: '' };
 let session = null;
@@ -117,14 +124,29 @@ function schedulePush(){
 
 /* ---------------- Auth ---------------- */
 
+/** Sisa jeda kirim ulang, dalam milidetik. 0 berarti boleh mengirim. */
+export function otpCooldownRemaining(){
+  return Math.max(0, (meta().otpCooldownUntil ?? 0) - Date.now());
+}
+
 export async function signIn(email){
+  if (otpCooldownRemaining() > 0) return false;
+
   const supabase = await getClient();
   setStatus('working', 'Mengirim tautan…');
+
   const { error } = await supabase.auth.signInWithOtp({
     email,
     options: { emailRedirectTo: location.origin + location.pathname },
   });
+
+  // Jeda hanya untuk percobaan yang benar-benar menyentuh pengirim email.
+  // Salah ketik alamat tidak memakai kuota, jadi tidak perlu ikut dijeda.
+  const kenaKuota = !error || /rate limit/i.test(error.message);
+  if (kenaKuota) setMeta({ otpCooldownUntil: Date.now() + OTP_COOLDOWN_MS });
+
   if (error){ setStatus('error', error.message); return false; }
+
   setStatus('signedout', `Tautan login dikirim ke ${email}. Buka email dan klik tautannya.`);
   return true;
 }

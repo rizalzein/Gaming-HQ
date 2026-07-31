@@ -1,7 +1,7 @@
 import { setHTML, esc, byId } from '../util/dom.js';
 import { isConfigured } from '../sync/credentials.js';
 import {
-  getStatus, getSession, getMeta, getConflict,
+  getStatus, getSession, getMeta, getConflict, otpCooldownRemaining,
   signIn, signOut, syncNow, resolveConflict, cancelConflict,
 } from '../sync/sync.js';
 import { openModal } from '../ui/modal.js';
@@ -30,18 +30,20 @@ export function renderSync(){
   }
 
   if (!session){
+    const busy = status.state === 'working';
     setHTML('syncbox', `
       <div class="setbox">
         <h4>Masuk untuk menyinkronkan</h4>
         <form class="addrow" id="sync-form" style="margin-top:0;grid-template-columns:1fr auto">
           <input type="email" id="sync-email" placeholder="email@anda.com" required
-                 autocomplete="email" ${status.state === 'working' ? 'disabled' : ''}>
-          <button class="btn" type="submit" ${status.state === 'working' ? 'disabled' : ''}>Kirim tautan</button>
+                 autocomplete="email" ${busy ? 'disabled' : ''}>
+          <button class="btn" type="submit" id="sync-send" ${busy ? 'disabled' : ''}>Kirim tautan</button>
         </form>
-        <div class="note">${status.message
+        <div class="note" id="sync-note">${status.message
           ? esc(status.message)
           : 'Tanpa password — Supabase mengirim tautan sekali pakai ke email Anda.'}</div>
       </div>`);
+    paintCooldown();
     return;
   }
 
@@ -61,6 +63,35 @@ export function renderSync(){
     </div>`);
 
   maybeShowConflict();
+}
+
+let cooldownTimer = null;
+
+/**
+ * Hitung mundur hanya menyentuh tombolnya, bukan merender ulang seluruh kotak.
+ * Kalau kotaknya dirender ulang tiap detik, email yang sedang diketik ikut
+ * terhapus di tengah pengetikan.
+ */
+function paintCooldown(){
+  const btn = document.getElementById('sync-send');
+  if (!btn){
+    clearInterval(cooldownTimer);
+    cooldownTimer = null;
+    return;
+  }
+
+  const detik = Math.ceil(otpCooldownRemaining() / 1000);
+
+  if (detik > 0){
+    btn.disabled = true;
+    btn.textContent = `Tunggu ${detik} dtk`;
+    cooldownTimer ??= setInterval(paintCooldown, 1000);
+  } else {
+    btn.disabled = getStatus().state === 'working';
+    btn.textContent = 'Kirim tautan';
+    clearInterval(cooldownTimer);
+    cooldownTimer = null;
+  }
 }
 
 function statusText(status, lastSyncedAt, dirty){
@@ -129,9 +160,16 @@ export const actions = {
 
 export const submits = {
   async 'sync-form'(){
+    const sisa = Math.ceil(otpCooldownRemaining() / 1000);
+    if (sisa > 0){
+      toast(`Tunggu ${sisa} detik sebelum minta tautan lagi.`, 'err');
+      return;
+    }
     const email = byId('sync-email').value.trim();
     if (!email){ toast('Isi email dulu.', 'err'); return; }
+
     const ok = await signIn(email);
-    if (ok) toast('Tautan login dikirim. Cek email Anda.');
+    toast(ok ? 'Tautan login dikirim. Cek email Anda.' : getStatus().message, ok ? 'ok' : 'err');
+    paintCooldown();
   },
 };
