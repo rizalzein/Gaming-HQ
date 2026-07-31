@@ -2,9 +2,9 @@ import { setHTML, esc, byId } from '../util/dom.js';
 import { isConfigured } from '../sync/credentials.js';
 import {
   getStatus, getSession, getMeta, getConflict, otpCooldownRemaining,
-  signIn, signOut, syncNow, resolveConflict, cancelConflict,
+  signIn, signInWithPassword, setPassword, signOut, syncNow, resolveConflict, cancelConflict,
 } from '../sync/sync.js';
-import { openModal } from '../ui/modal.js';
+import { openModal, field, input } from '../ui/modal.js';
 import { toast } from '../ui/toast.js';
 
 const DOT = { ok:'good', working:'', error:'err', conflict:'warn', signedout:'', idle:'', off:'' };
@@ -34,14 +34,20 @@ export function renderSync(){
     setHTML('syncbox', `
       <div class="setbox">
         <h4>Masuk untuk menyinkronkan</h4>
-        <form class="addrow" id="sync-form" style="margin-top:0;grid-template-columns:1fr auto">
+        <form class="addrow" id="sync-form" style="margin-top:0;grid-template-columns:1fr">
           <input type="email" id="sync-email" placeholder="email@anda.com" required
                  autocomplete="email" ${busy ? 'disabled' : ''}>
-          <button class="btn" type="submit" id="sync-send" ${busy ? 'disabled' : ''}>Kirim tautan</button>
+          <input type="password" id="sync-pass" placeholder="password"
+                 autocomplete="current-password" ${busy ? 'disabled' : ''}>
+          <div class="modal-actions" style="margin:0;justify-content:flex-start">
+            <button class="btn" type="submit" ${busy ? 'disabled' : ''}>Masuk</button>
+            <button class="btn ghost" type="button" id="sync-send" data-act="sync:magic"
+                    ${busy ? 'disabled' : ''}>${MAGIC_LABEL}</button>
+          </div>
         </form>
         <div class="note" id="sync-note">${status.message
           ? esc(status.message)
-          : 'Tanpa password — Supabase mengirim tautan sekali pakai ke email Anda.'}</div>
+          : 'Punya password? Langsung masuk. Belum punya? Pakai tautan email, lalu atur password dari perangkat ini agar perangkat berikutnya tidak perlu email lagi.'}</div>
       </div>`);
     paintCooldown();
     return;
@@ -58,12 +64,18 @@ export function renderSync(){
       <div class="modal-actions" style="margin-top:12px;justify-content:flex-start">
         <button type="button" class="btn ghost" data-act="sync:now"
                 ${status.state === 'working' ? 'disabled' : ''}>⟳ Sinkronkan sekarang</button>
+        <button type="button" class="btn ghost" data-act="sync:setpass">🔑 Atur password</button>
         <button type="button" class="btn ghost" data-act="sync:signout">Keluar</button>
       </div>
+      <div class="note">Atur password sekali di sini, lalu perangkat lain bisa masuk
+        dengan email + password — tanpa menunggu email dan tanpa kena batas kirim.</div>
     </div>`);
 
   maybeShowConflict();
 }
+
+/** Satu sumber label agar hitung mundur tidak menimpanya dengan teks berbeda. */
+const MAGIC_LABEL = 'Kirim tautan email';
 
 let cooldownTimer = null;
 
@@ -88,7 +100,7 @@ function paintCooldown(){
     cooldownTimer ??= setInterval(paintCooldown, 1000);
   } else {
     btn.disabled = getStatus().state === 'working';
-    btn.textContent = 'Kirim tautan';
+    btn.textContent = MAGIC_LABEL;
     clearInterval(cooldownTimer);
     cooldownTimer = null;
   }
@@ -152,14 +164,8 @@ function maybeShowConflict(){
 
 export const actions = {
   async 'sync:now'(){ await syncNow(); },
-  async 'sync:signout'(){
-    if (!confirm('Keluar dari sinkronisasi? Data di perangkat ini tetap ada.')) return;
-    await signOut();
-  },
-};
 
-export const submits = {
-  async 'sync-form'(){
+  async 'sync:magic'(){
     const sisa = Math.ceil(otpCooldownRemaining() / 1000);
     if (sisa > 0){
       toast(`Tunggu ${sisa} detik sebelum minta tautan lagi.`, 'err');
@@ -171,5 +177,45 @@ export const submits = {
     const ok = await signIn(email);
     toast(ok ? 'Tautan login dikirim. Cek email Anda.' : getStatus().message, ok ? 'ok' : 'err');
     paintCooldown();
+  },
+
+  'sync:setpass'(){
+    openModal({
+      title: 'Atur password',
+      body:
+        field('Password baru', input('p1', '', 'type="password" autocomplete="new-password" required'),
+              'Minimal 8 karakter. Setelah ini, perangkat lain bisa masuk pakai email + password tanpa menunggu email.') +
+        field('Ulangi password', input('p2', '', 'type="password" autocomplete="new-password" required')),
+      confirmLabel: 'Simpan password',
+      onConfirm(form){
+        const p1 = form.p1.value, p2 = form.p2.value;
+        if (p1.length < 8){ toast('Password minimal 8 karakter.', 'err'); return false; }
+        if (p1 !== p2){ toast('Ulangan password tidak sama.', 'err'); return false; }
+        setPassword(p1)
+          .then(() => toast('Password tersimpan. Pakai email + password ini di perangkat lain.'))
+          .catch(e => toast('Gagal menyimpan password: ' + e.message, 'err'));
+      },
+    });
+  },
+  async 'sync:signout'(){
+    if (!confirm('Keluar dari sinkronisasi? Data di perangkat ini tetap ada.')) return;
+    await signOut();
+  },
+};
+
+export const submits = {
+  async 'sync-form'(){
+    const email = byId('sync-email').value.trim();
+    const pass  = byId('sync-pass').value;
+
+    if (!email){ toast('Isi email dulu.', 'err'); return; }
+    if (!pass){
+      toast('Isi password, atau tekan “Kirim tautan email”.', 'err');
+      return;
+    }
+
+    const ok = await signInWithPassword(email, pass);
+    if (ok) toast('Berhasil masuk.');
+    else    toast(getStatus().message, 'err');
   },
 };

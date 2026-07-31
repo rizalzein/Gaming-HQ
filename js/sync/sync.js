@@ -151,6 +151,25 @@ export async function signIn(email){
   return true;
 }
 
+/**
+ * Masuk dengan password. Tidak menyentuh pengirim email sama sekali, jadi
+ * bebas dari batas kirim — inilah jalur yang dipakai saat menambah perangkat.
+ */
+export async function signInWithPassword(email, password){
+  const supabase = await getClient();
+  setStatus('working', 'Masuk…');
+  const { error } = await supabase.auth.signInWithPassword({ email, password });
+  if (error){ setStatus('error', error.message); return false; }
+  return true;                       // onAuthStateChange yang memicu sinkronisasi
+}
+
+/** Pasang atau ganti password untuk akun yang sedang masuk. */
+export async function setPassword(password){
+  const supabase = await getClient();
+  const { error } = await supabase.auth.updateUser({ password });
+  if (error) throw new Error(error.message);
+}
+
 export async function signOut(){
   const supabase = await getClient();
   await supabase.auth.signOut();

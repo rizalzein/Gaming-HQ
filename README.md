@@ -194,9 +194,28 @@ dibuka, saat kembali dari background, dan saat koneksi pulih.
 4. **Project Settings → API**, salin *Project URL* dan *anon public key* ke
    [`js/sync/credentials.js`](js/sync/credentials.js).
 
-5. Commit dan push. Setelah Pages selesai build, buka bagian **◈ 09
-   Sinkronisasi**, masukkan email, klik tautan yang masuk. Ulangi di perangkat
-   lain dengan **email yang sama**.
+5. Commit dan push. Setelah Pages selesai build, buka **◈ 09 Sinkronisasi**,
+   masukkan email, tekan **Kirim tautan email**, lalu klik tautan yang masuk.
+
+### Menambah perangkat tanpa email
+
+Layanan email bawaan Supabase dibatasi beberapa kirim per jam dan memang
+ditujukan untuk pengujian saja. Mengandalkan magic link di tiap perangkat cepat
+menabrak batas itu — termasuk saat mencoba login di HP.
+
+Karena itu ada jalur kedua:
+
+1. Dari perangkat yang **sudah masuk**, tekan **🔑 Atur password** dan simpan
+   password minimal 8 karakter.
+2. Di perangkat berikutnya, isi email + password lalu tekan **Masuk**.
+
+Jalur ini tidak menyentuh pengirim email sama sekali, jadi bebas dari batas
+kirim. Magic link tetap tersedia sebagai cadangan, dengan jeda 60 detik antar
+permintaan agar kuota tidak terbakar klik beruntun.
+
+Kalau tetap ingin magic link lega di semua perangkat, pasang SMTP sendiri
+(Brevo, Resend, dan sejenisnya) di **Authentication → SMTP Settings** — itu
+pengaturan dashboard, tidak perlu perubahan kode.
 
 ### Catatan keamanan
 
