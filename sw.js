@@ -2,9 +2,9 @@
  * Service worker offline-first.
  * Naikkan VERSION setiap kali file di PRECACHE berubah agar klien mengambil versi baru.
  */
-const VERSION = 'v4';
-const CACHE   = `markas-gacha-${VERSION}`;
-const VENDOR  = `markas-gacha-vendor`;   // font + supabase-js dari CDN
+const VERSION = 'v5';
+const CACHE   = `gaming-hq-${VERSION}`;
+const VENDOR  = `gaming-hq-vendor`;      // font + supabase-js dari CDN
 
 const PRECACHE = [
   './',

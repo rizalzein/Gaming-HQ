@@ -62,10 +62,11 @@ document.addEventListener('submit', e => {
 setSaveErrorHandler(err => toast('Gagal menyimpan: ' + err.message, 'err'));
 subscribe(render);
 
-const { migrated } = load();
+const { migrated, dariKunciLama } = load();
 render();
 
-if (migrated) toast('Data lama berhasil dimigrasi ke format baru.');
+if (migrated)           toast('Data lama berhasil dimigrasi ke format baru.');
+else if (dariKunciLama) toast('Data dipindahkan ke penyimpanan Gaming HQ.');
 
 // Sinkronisasi opsional — kalau Supabase belum dikonfigurasi, ini tidak
 // melakukan apa pun dan tidak mengunduh apa pun.

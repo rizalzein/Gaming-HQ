@@ -16,7 +16,8 @@ import { S, replaceState, subscribe } from '../state.js';
 import { isConfigured } from './credentials.js';
 import { getClient, cleanAuthUrl } from './client.js';
 
-const META_KEY  = 'markas-gacha:sync';
+const META_KEY  = 'gaming-hq:sync';
+const LEGACY_META_KEY = 'markas-gacha:sync';   // dari masa aplikasi bernama Markas Gacha
 const TABLE     = 'app_state';
 const PUSH_DELAY = 4000;
 
@@ -51,8 +52,19 @@ export const getConflict = () => pendingConflict;
 /* ---------------- Metadata lokal ---------------- */
 
 function meta(){
-  try { return JSON.parse(localStorage.getItem(META_KEY)) || {}; }
-  catch { return {}; }
+  try {
+    const current = localStorage.getItem(META_KEY);
+    if (current !== null) return JSON.parse(current) || {};
+
+    // Pindahkan sekali dari kunci lama, lalu kunci baru yang dipakai seterusnya.
+    const warisan = localStorage.getItem(LEGACY_META_KEY);
+    if (warisan !== null){
+      const isi = JSON.parse(warisan) || {};
+      localStorage.setItem(META_KEY, JSON.stringify(isi));
+      return isi;
+    }
+    return {};
+  } catch { return {}; }
 }
 
 function setMeta(patch){

@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Markas Gacha">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Gaming Headquarters">
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0" stop-color="#121631"/>
@@ -12,7 +12,7 @@
 
   <rect width="512" height="512" rx="112" fill="url(#bg)"/>
 
-  <!-- markas: atap + pilar -->
+  <!-- markas besar: atap + pilar -->
   <path d="M256 118 L392 206 L392 236 L120 236 L120 206 Z" fill="url(#edge)"/>
   <rect x="150" y="262" width="34" height="128" rx="8" fill="#57e6ff" opacity=".85"/>
   <rect x="239" y="262" width="34" height="128" rx="8" fill="#e8ebff" opacity=".9"/>

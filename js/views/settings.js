@@ -1,5 +1,5 @@
 import { S, commit, uid, loginTaskId, replaceState, defaultState, serialize, storageSizeKB } from '../state.js';
-import { TZ_CHOICES, PRIO_LABELS, GAME_PRESETS, STORAGE_KEY } from '../config.js';
+import { TZ_CHOICES, PRIO_LABELS, GAME_PRESETS, STORAGE_KEY, LEGACY_STORAGE_KEY } from '../config.js';
 import { setHTML, esc, byId } from '../util/dom.js';
 import { tzLabel, hourLabel } from '../util/format.js';
 import { localDayKey } from '../util/date.js';
@@ -184,7 +184,7 @@ function exportData(){
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = `markas-gacha-backup-${localDayKey()}.json`;
+  a.download = `gaming-hq-backup-${localDayKey()}.json`;
   a.click();
   URL.revokeObjectURL(url);
   toast('Backup diunduh.');
@@ -230,9 +230,13 @@ export const actions = {
   'data:export': exportData,
   'data:importPick'(){ byId('import-file').click(); },
   'data:reset'(){
-    if (!confirm('Hapus SEMUA data Markas Gacha dan kembali ke bawaan?')) return;
+    if (!confirm('Hapus SEMUA data Gaming HQ dan kembali ke bawaan?')) return;
     if (!confirm('Yakin? Streak, budget, dan catatan pity ikut hilang. Sudah backup?')) return;
-    try { localStorage.removeItem(STORAGE_KEY); } catch {}
+    // Kunci lama ikut dibuang, kalau tidak reset akan langsung memulihkannya.
+    try {
+      localStorage.removeItem(STORAGE_KEY);
+      localStorage.removeItem(LEGACY_STORAGE_KEY);
+    } catch {}
     replaceState(defaultState());
     toast('Data dikembalikan ke bawaan.');
   },

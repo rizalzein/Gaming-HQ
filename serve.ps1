@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-  Server statis kecil untuk pengembangan lokal Markas Gacha.
+  Server statis kecil untuk pengembangan lokal Gaming Headquarters.
 
 .DESCRIPTION
   ES modules dan service worker tidak jalan lewat file://, jadi selama ngoding
@@ -52,7 +52,7 @@ try {
 }
 
 Write-Host ""
-Write-Host "  Markas Gacha dev server" -ForegroundColor Cyan
+Write-Host "  Gaming HQ dev server" -ForegroundColor Cyan
 Write-Host "  http://localhost:$Port/" -ForegroundColor Green
 Write-Host "  root: $root"
 Write-Host "  Tekan Ctrl+C untuk berhenti."

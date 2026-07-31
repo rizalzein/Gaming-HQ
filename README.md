@@ -1,4 +1,4 @@
-# Markas Gacha
+# Gaming Headquarters
 
 Pelacak harian untuk game live-service / gacha: login harian dengan streak, tugas
 mingguan & bulanan, deadline event, budget top-up, jadwal patch, posisi story, dan
@@ -87,9 +87,16 @@ diedit per banner lewat modal game.
 
 ## Data & backup
 
-Kunci penyimpanan: `markas-gacha`. Skema saat ini **v3**; data dari versi lama
+Kunci penyimpanan: `gaming-hq`. Skema saat ini **v3**; data dari versi lama
 (v1/v2 — format `checks` / `prios` / `pity` angka tunggal) dimigrasi otomatis
 saat pertama kali dibuka, sekali saja.
+
+Aplikasi ini sebelumnya bernama *Markas Gacha* dan memakai kunci `markas-gacha`.
+Kalau kunci baru belum ada, isi kunci lama dibaca sekali lalu dipindahkan — jadi
+data lama ikut terbawa tanpa langkah manual. Entri lamanya sengaja **tidak
+dihapus** agar tetap ada salinan; ia tidak akan dibaca lagi setelah kunci baru
+terisi. Hal yang sama berlaku untuk metadata sinkronisasi
+(`markas-gacha:sync` → `gaming-hq:sync`).
 
 **Penting:** `localStorage` terikat pada satu origin. Data yang tersimpan saat
 membuka file lewat `file://` **tidak** ikut terbaca di `http://localhost:8123`

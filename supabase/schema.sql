@@ -1,4 +1,4 @@
--- Skema sinkronisasi Markas Gacha.
+-- Skema sinkronisasi Gaming Headquarters.
 -- Jalankan di Supabase dashboard → SQL Editor → New query → Run.
 --
 -- Model: satu baris per pengguna, berisi seluruh state aplikasi sebagai JSON.

@@ -7,8 +7,8 @@
  */
 
 import {
-  STORAGE_KEY, SCHEMA_VERSION, GAME_PRESETS, DEFAULT_RESET, DEFAULT_BUDGET_CAP,
-  SEED_PRIORITIES, SEED_EVENTS, SEED_PATCHES, SEED_STORY, SEED_HOLIDAY,
+  STORAGE_KEY, LEGACY_STORAGE_KEY, SCHEMA_VERSION, GAME_PRESETS, DEFAULT_RESET,
+  DEFAULT_BUDGET_CAP, SEED_PRIORITIES, SEED_EVENTS, SEED_PATCHES, SEED_STORY, SEED_HOLIDAY,
 } from './config.js';
 
 export let S = null;
@@ -157,15 +157,31 @@ export function setSaveErrorHandler(fn){ onSaveError = fn; }
 
 export function load(){
   let raw = null;
+  let dariKunciLama = false;
+
   try {
-    raw = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
+    const current = localStorage.getItem(STORAGE_KEY);
+    if (current !== null){
+      raw = JSON.parse(current);
+    } else {
+      const warisan = localStorage.getItem(LEGACY_STORAGE_KEY);
+      if (warisan !== null){
+        raw = JSON.parse(warisan);
+        dariKunciLama = true;
+      }
+    }
   } catch (e){
     console.error('Data tersimpan rusak, memakai default:', e);
   }
-  const legacy = raw && (raw.version ?? raw.dataVersion ?? 1) < SCHEMA_VERSION;
+
+  const skemaLama = raw && (raw.version ?? raw.dataVersion ?? 1) < SCHEMA_VERSION;
   S = migrate(raw);
-  if (legacy) save();          // tulis ulang dalam bentuk baru sekali saja
-  return { migrated: !!legacy, fresh: !raw };
+
+  // Tulis ulang sekali kalau skemanya naik versi atau isinya baru dipindahkan
+  // dari kunci lama, supaya pemuatan berikutnya langsung memakai kunci baru.
+  if (skemaLama || dariKunciLama) save();
+
+  return { migrated: !!skemaLama, dariKunciLama, fresh: !raw };
 }
 
 export function save(){

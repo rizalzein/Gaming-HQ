@@ -3,8 +3,16 @@
  * begitu app dijalankan, datanya pindah ke state dan bisa diedit lewat UI.
  */
 
-export const STORAGE_KEY    = 'markas-gacha';
+export const STORAGE_KEY    = 'gaming-hq';
 export const SCHEMA_VERSION = 3;
+
+/**
+ * Kunci lama dari masa aplikasi ini bernama Markas Gacha. Dibaca sekali saat
+ * kunci baru belum ada, lalu isinya dipindahkan. Entri lamanya sengaja tidak
+ * dihapus supaya masih ada salinan kalau terjadi sesuatu — ia tidak akan
+ * dibaca lagi setelah kunci baru terisi.
+ */
+export const LEGACY_STORAGE_KEY = 'markas-gacha';
 
 /** Server Asia HoYoverse / Kuro reset 04:00 UTC+8 (= 03:00 WIB). */
 export const DEFAULT_RESET = { tz: 480, hour: 4 };
