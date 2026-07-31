@@ -1,0 +1,27 @@
+/* Design tokens — satu-satunya tempat warna & ukuran dasar didefinisikan. */
+:root{
+  --bg0:#0b0e1a;
+  --bg1:#121631;
+  --card:#171c3a;
+  --card2:#1d2347;
+  --line:rgba(140,160,255,.14);
+
+  --txt:#e8ebff;
+  --dim:#9aa3cf;
+  --faint:#6a739f;
+
+  --cyan:#57e6ff;
+  --mag:#ff5fd0;
+  --gold:#ffd166;
+  --red:#ff6b7a;
+  --green:#7ef0a6;
+
+  --r:14px;
+  --r-sm:10px;
+
+  --font-display:'Chakra Petch','Segoe UI',system-ui,sans-serif;
+  --font-body:'Plus Jakarta Sans','Segoe UI',system-ui,sans-serif;
+
+  --gap:10px;
+  --wrap:920px;
+}

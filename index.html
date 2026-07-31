@@ -2,132 +2,22 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0b0e1a">
+<meta name="description" content="Pelacak harian live-service & gacha: login, tugas mingguan, deadline event, budget top-up, dan pity.">
 <title>Markas Gacha</title>
+
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="assets/icon-192.png">
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-<style>
-  :root{
-    --bg0:#0b0e1a; --bg1:#121631; --card:#171c3a; --card2:#1d2347;
-    --line:rgba(140,160,255,.14); --txt:#e8ebff; --dim:#9aa3cf; --faint:#6a739f;
-    --cyan:#57e6ff; --mag:#ff5fd0; --gold:#ffd166; --red:#ff6b7a; --green:#7ef0a6;
-    --r:14px;
-  }
-  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-  body{
-    font-family:'Plus Jakarta Sans',system-ui,sans-serif;
-    background:
-      radial-gradient(900px 500px at 85% -10%, rgba(87,230,255,.10), transparent 60%),
-      radial-gradient(700px 450px at -10% 25%, rgba(255,95,208,.09), transparent 55%),
-      linear-gradient(180deg,var(--bg1),var(--bg0) 40%);
-    background-attachment:fixed;
-    color:var(--txt); min-height:100vh; padding:18px 14px 80px;
-  }
-  .wrap{max-width:920px;margin:0 auto}
 
-  header{margin-bottom:20px}
-  .eyebrow{font-family:'Chakra Petch';font-size:.68rem;letter-spacing:.32em;color:var(--cyan);text-transform:uppercase}
-  h1{font-family:'Chakra Petch';font-size:clamp(1.6rem,5vw,2.3rem);font-weight:700;line-height:1.1;margin:4px 0 8px}
-  h1 .accent{color:var(--mag)}
-  .hud{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
-  .chip{font-family:'Chakra Petch';font-size:.72rem;padding:6px 12px;border:1px solid var(--line);border-radius:999px;color:var(--dim);background:rgba(255,255,255,.03)}
-  .chip b{color:var(--txt);font-weight:600}
-  .chip.warn{border-color:rgba(255,209,102,.4);color:var(--gold)}
-
-  .holiday{background:linear-gradient(135deg,rgba(87,230,255,.12),rgba(255,95,208,.10));border:1px solid rgba(87,230,255,.35);border-radius:var(--r);padding:14px 16px;margin-bottom:22px}
-  .holiday h3{font-family:'Chakra Petch';font-size:.9rem;letter-spacing:.06em;margin-bottom:6px}
-  .holiday p{font-size:.8rem;color:var(--dim);line-height:1.6}
-  .holiday ul{margin:8px 0 0 18px;font-size:.8rem;color:var(--dim);line-height:1.7}
-  .toggle{font-family:'Chakra Petch';font-size:.7rem;letter-spacing:.05em;cursor:pointer;user-select:none;border:1px solid var(--line);border-radius:999px;padding:5px 12px;color:var(--faint);background:transparent;margin-top:10px}
-  .toggle:hover{border-color:var(--cyan);color:var(--cyan)}
-
-  section{margin-bottom:26px}
-  .sec-head{display:flex;align-items:baseline;gap:10px;margin-bottom:12px;border-bottom:1px solid var(--line);padding-bottom:8px;flex-wrap:wrap}
-  .sec-head h2{font-family:'Chakra Petch';font-size:.95rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase}
-  .sec-head .tag{font-size:.7rem;color:var(--faint)}
-  .sec-head .glyph{color:var(--cyan);font-family:'Chakra Petch';font-size:.8rem}
-
-  .roster{display:grid;grid-template-columns:1fr;gap:10px}
-  @media(min-width:640px){.roster{grid-template-columns:1fr 1fr}}
-  .gcard{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px;border-left:4px solid var(--gc,#888);transition:transform .12s ease,background .2s}
-  .gcard:active{transform:scale(.985)}
-  .gcard.done{background:linear-gradient(90deg,rgba(126,240,166,.07),var(--card) 55%)}
-  .ginfo{flex:1;min-width:0}
-  .gname{font-family:'Chakra Petch';font-weight:600;font-size:.92rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .gmeta{display:flex;gap:8px;align-items:center;margin-top:3px;flex-wrap:wrap}
-  .streak{font-size:.7rem;color:var(--faint)}
-  .streak b{color:var(--gold)}
-  .prio{font-family:'Chakra Petch';font-size:.62rem;letter-spacing:.08em;text-transform:uppercase;padding:2px 8px;border-radius:4px;cursor:pointer;user-select:none;border:1px solid transparent}
-  .prio.p0{background:rgba(255,95,208,.15);color:var(--mag);border-color:rgba(255,95,208,.35)}
-  .prio.p1{background:rgba(87,230,255,.12);color:var(--cyan);border-color:rgba(87,230,255,.3)}
-  .prio.p2{background:rgba(154,163,207,.1);color:var(--dim);border-color:var(--line)}
-  .claim{font-family:'Chakra Petch';font-weight:700;font-size:.72rem;letter-spacing:.06em;min-width:86px;padding:10px 0;text-align:center;border-radius:10px;cursor:pointer;border:1.5px dashed rgba(154,163,207,.45);color:var(--dim);background:transparent;transition:all .15s ease;user-select:none}
-  .claim:hover{border-color:var(--cyan);color:var(--cyan)}
-  .claim.stamped{border:1.5px solid var(--green);color:var(--green);background:rgba(126,240,166,.08);transform:rotate(-4deg) scale(1.02);box-shadow:0 0 14px rgba(126,240,166,.15)}
-
-  .evlist{display:flex;flex-direction:column;gap:8px}
-  .ev{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:11px 14px}
-  .ev .days{font-family:'Chakra Petch';font-weight:700;font-size:1.05rem;min-width:56px;text-align:center;color:var(--cyan);line-height:1}
-  .ev .days small{display:block;font-size:.58rem;font-weight:500;color:var(--faint);letter-spacing:.1em;margin-top:2px}
-  .ev.urgent .days{color:var(--red)}
-  .ev.past{opacity:.4}
-  .ev.past .days{color:var(--faint)}
-  .ev.money{border-color:rgba(255,209,102,.45)}
-  .evbody{flex:1;min-width:0}
-  .evname{font-weight:600;font-size:.88rem}
-  .evsub{font-size:.72rem;color:var(--faint);margin-top:2px}
-  .del{background:none;border:none;color:var(--faint);cursor:pointer;font-size:1rem;padding:4px 6px;border-radius:6px}
-  .del:hover{color:var(--red);background:rgba(255,107,122,.1)}
-  .addrow{display:grid;grid-template-columns:1fr;gap:8px;margin-top:12px}
-  @media(min-width:640px){.addrow{grid-template-columns:2fr 1.2fr 1fr auto}}
-  input,select{font-family:inherit;font-size:.85rem;background:var(--card2);color:var(--txt);border:1px solid var(--line);border-radius:10px;padding:10px 12px;width:100%}
-  input:focus,select:focus{outline:2px solid rgba(87,230,255,.4);outline-offset:1px}
-  input::placeholder{color:var(--faint)}
-  .btn{font-family:'Chakra Petch';font-weight:600;font-size:.8rem;letter-spacing:.05em;background:linear-gradient(135deg,rgba(87,230,255,.18),rgba(255,95,208,.18));color:var(--txt);border:1px solid rgba(87,230,255,.35);border-radius:10px;padding:10px 18px;cursor:pointer;white-space:nowrap}
-  .btn:hover{border-color:var(--cyan)}
-  .btn.ghost{background:transparent;border-color:var(--line);color:var(--faint);padding:6px 12px;font-size:.7rem}
-  .btn.ghost:hover{color:var(--cyan);border-color:var(--cyan)}
-
-  .budget-card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px}
-  .bud-top{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:6px}
-  .bud-num{font-family:'Chakra Petch';font-size:1.5rem;font-weight:700}
-  .bud-num.over{color:var(--red)}
-  .bud-cap{font-size:.75rem;color:var(--faint)}
-  .bar{height:10px;background:var(--card2);border-radius:99px;margin:12px 0;overflow:hidden}
-  .bar i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--cyan),var(--mag));transition:width .3s}
-  .bar i.over{background:linear-gradient(90deg,var(--gold),var(--red))}
-  .bud-entries{margin-top:10px;display:flex;flex-direction:column;gap:6px}
-  .bud-e{display:flex;justify-content:space-between;align-items:center;font-size:.82rem;padding:7px 10px;background:var(--card2);border-radius:8px}
-  .bud-e .lbl{color:var(--dim)}
-  .bud-e .amt{font-family:'Chakra Petch';font-weight:600}
-  .bud-add{display:grid;grid-template-columns:2fr 1fr auto;gap:8px;margin-top:12px}
-
-  .patchlist{display:grid;grid-template-columns:1fr;gap:6px}
-  @media(min-width:640px){.patchlist{grid-template-columns:1fr 1fr}}
-  .patch{display:flex;justify-content:space-between;align-items:center;gap:8px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:9px 13px;font-size:.82rem;border-left:3px solid var(--pc,#888)}
-  .patch .pd{font-family:'Chakra Petch';color:var(--dim);font-size:.75rem;white-space:nowrap}
-
-  .pitygrid{display:grid;grid-template-columns:1fr;gap:8px}
-  @media(min-width:640px){.pitygrid{grid-template-columns:1fr 1fr}}
-  .pity{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:9px 12px;border-left:3px solid var(--gc)}
-  .pity .pn{font-size:.8rem;font-weight:600;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .pity input{width:64px;text-align:center;padding:7px 6px;font-family:'Chakra Petch'}
-  .pity .plabel{font-size:.65rem;color:var(--faint)}
-
-  .storygrid{display:flex;flex-direction:column;gap:6px}
-  .story{display:flex;gap:10px;align-items:flex-start;background:var(--card);border:1px solid var(--line);border-left:3px solid var(--gc);border-radius:10px;padding:9px 13px;font-size:.8rem}
-  .story .sn{font-family:'Chakra Petch';font-weight:600;min-width:96px;color:var(--txt)}
-  .story .sp{color:var(--dim);flex:1;line-height:1.45}
-  .story input{background:transparent;border:none;padding:0;color:var(--dim);font-size:.8rem}
-  .story input:focus{outline:none;border-bottom:1px solid var(--cyan);color:var(--txt)}
-
-  footer{border-top:1px solid var(--line);padding-top:14px;margin-top:34px;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-  footer .note{margin:0;flex:1;min-width:200px}
-  .note{font-size:.72rem;color:var(--faint);margin-top:10px;line-height:1.5}
-  .savebadge{position:fixed;bottom:16px;right:16px;font-family:'Chakra Petch';font-size:.68rem;background:rgba(126,240,166,.12);border:1px solid rgba(126,240,166,.4);color:var(--green);padding:6px 14px;border-radius:999px;opacity:0;transition:opacity .3s;pointer-events:none}
-  .savebadge.show{opacity:1}
-  @media (prefers-reduced-motion:reduce){*{transition:none!important}}
-</style>
+<link rel="stylesheet" href="css/tokens.css">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/components.css">
 </head>
 <body>
 <div class="wrap">
@@ -135,343 +25,127 @@
   <header>
     <div class="eyebrow">Daily Ops · Live-Service Tracker</div>
     <h1>MARKAS <span class="accent">GACHA</span></h1>
-    <div class="hud">
-      <span class="chip" id="chip-date"></span>
-      <span class="chip">Login hari ini: <b id="chip-login">0/8</b></span>
-      <span class="chip warn" id="chip-trip"></span>
-    </div>
+    <div class="hud" id="hud"></div>
   </header>
 
-  <div class="holiday" id="holiday" style="display:none">
-    <h3>🌴 MODE LIBURAN AKTIF</h3>
-    <p>Target hari ini cuma jaga streak — <b>5 menit dari HP</b>, sisanya nikmati liburan.</p>
-    <ul>
-      <li>Endfield, NTE, SL:ARISE — login + claim, jangan main</li>
-      <li>4 game HoYo/Kuro — buka, klaim daily, tutup</li>
-      <li>Jangan buka event besar, jangan pull, jangan farming</li>
-    </ul>
-    <button class="toggle" onclick="toggleHoliday()">Matikan mode liburan</button>
-  </div>
+  <div id="holiday-banner"></div>
 
-  <section>
-    <div class="sec-head"><span class="glyph">◈ 01</span><h2>Login Harian</h2><span class="tag">tap CLAIM untuk stempel · tap badge untuk ganti prioritas · reset tiap hari</span></div>
+  <section id="sec-daily">
+    <div class="sec-head">
+      <span class="glyph">◈ 01</span>
+      <h2>Login Harian</h2>
+      <span class="tag">tap CLAIM untuk stempel · tap badge untuk ganti prioritas</span>
+      <button class="btn ghost" data-act="holiday:toggle">Mode liburan</button>
+    </div>
     <div class="roster" id="roster"></div>
-    <button class="toggle" id="hol-on" onclick="toggleHoliday()">Aktifkan mode liburan</button>
   </section>
 
-  <section>
-    <div class="sec-head"><span class="glyph">◈ 02</span><h2>Deadline Event</h2><span class="tag">diurutkan dari yang paling mendesak</span>
-      <button class="btn ghost" onclick="clearPast()">Bersihkan yang lewat</button>
+  <section id="sec-periodic">
+    <div class="sec-head">
+      <span class="glyph">◈ 02</span>
+      <h2>Tugas Berulang</h2>
+      <span class="tag" id="periodic-tag">mingguan, bulanan, atau harian tambahan</span>
+      <button class="btn ghost" data-act="task:new">+ Tugas</button>
+    </div>
+    <div class="tasklist" id="periodic"></div>
+  </section>
+
+  <section id="sec-events">
+    <div class="sec-head">
+      <span class="glyph">◈ 03</span>
+      <h2>Deadline Event</h2>
+      <span class="tag">diurutkan dari yang paling mendesak</span>
+      <button class="btn ghost" data-act="event:clearPast">Bersihkan yang lewat</button>
     </div>
     <div class="evlist" id="evlist"></div>
-    <div class="addrow">
-      <input id="ev-name" placeholder="Nama event / deadline baru…">
+    <form class="addrow" id="ev-form">
+      <input id="ev-name" placeholder="Nama event / deadline baru…" required>
       <select id="ev-game"></select>
-      <input id="ev-date" type="date">
-      <button class="btn" onclick="addEvent()">+ Tambah</button>
-    </div>
+      <input id="ev-date" type="date" required>
+      <button class="btn" type="submit">+ Tambah</button>
+    </form>
   </section>
 
-  <section>
-    <div class="sec-head"><span class="glyph">◈ 03</span><h2>Budget Top-Up</h2><span class="tag" id="bud-month-label"></span></div>
+  <section id="sec-budget">
+    <div class="sec-head">
+      <span class="glyph">◈ 04</span>
+      <h2>Budget Top-Up</h2>
+      <span class="tag" id="bud-month-label"></span>
+      <button class="btn ghost" data-act="budget:editCap">Ubah plafon</button>
+    </div>
     <div class="budget-card">
       <div class="bud-top">
-        <div><span class="bud-num" id="bud-total">Rp 0</span> <span class="bud-cap">dari plafon Rp 400.000</span></div>
+        <div><span class="bud-num" id="bud-total">Rp 0</span> <span class="bud-cap" id="bud-capline"></span></div>
         <div class="bud-cap" id="bud-sisa"></div>
       </div>
       <div class="bar"><i id="bud-bar" style="width:0%"></i></div>
       <div class="bud-entries" id="bud-entries"></div>
-      <div class="bud-add">
-        <input id="bud-lbl" placeholder="Misal: Welkin Genshin">
-        <input id="bud-amt" type="number" placeholder="Rp" min="0">
-        <button class="btn" onclick="addBudget()">+ Catat</button>
-      </div>
-      <div class="note">Plafon Rp 400 rb/bulan via e-wallet terpisah. Cicilan Rp 6 jt/bulan masih jalan sampai September.</div>
+      <form class="bud-add" id="bud-form">
+        <input id="bud-lbl" placeholder="Misal: Welkin Genshin" required>
+        <input id="bud-amt" type="number" placeholder="Rp" min="0" step="1000" required>
+        <button class="btn" type="submit">+ Catat</button>
+      </form>
+      <div class="note" id="bud-history"></div>
     </div>
   </section>
 
-  <section>
-    <div class="sec-head"><span class="glyph">◈ 04</span><h2>Jadwal Patch</h2><span class="tag">versi berikutnya per game</span></div>
+  <section id="sec-patches">
+    <div class="sec-head">
+      <span class="glyph">◈ 05</span>
+      <h2>Jadwal Patch</h2>
+      <span class="tag">versi berikutnya per game</span>
+      <button class="btn ghost" data-act="patch:new">+ Patch</button>
+    </div>
     <div class="patchlist" id="patchlist"></div>
-    <div class="note">Tanggal per akhir Juli 2026; sebagian estimasi siklus. Cek ulang menjelang tanggalnya.</div>
+    <div class="note">Sebagian tanggal adalah estimasi siklus. Cek ulang menjelang tanggalnya.</div>
   </section>
 
-  <section>
-    <div class="sec-head"><span class="glyph">◈ 05</span><h2>Posisi Story</h2><span class="tag">klik teksnya untuk mengedit</span></div>
+  <section id="sec-story">
+    <div class="sec-head">
+      <span class="glyph">◈ 06</span>
+      <h2>Posisi Story</h2>
+      <span class="tag">klik teksnya untuk mengedit</span>
+    </div>
     <div class="storygrid" id="storygrid"></div>
   </section>
 
-  <section>
-    <div class="sec-head"><span class="glyph">◈ 06</span><h2>Catatan Pity</h2><span class="tag">pull sejak bintang 5/S terakhir</span></div>
+  <section id="sec-pity">
+    <div class="sec-head">
+      <span class="glyph">◈ 07</span>
+      <h2>Catatan Pity</h2>
+      <span class="tag">pull sejak bintang 5 / S terakhir</span>
+    </div>
     <div class="pitygrid" id="pitygrid"></div>
-    <div class="note">HSR: soft pity ±74, hard pity 90, masih ada 50/50 — target 90+ sebelum menyerbu banner collab. WuWa weapon banner: dijamin 80 pull, tanpa 50/50.</div>
+    <div class="note">Angka soft/hard pity bisa diedit per banner lewat ⚙ Pengaturan → game → Banner, karena beda tiap game.</div>
+  </section>
+
+  <section id="sec-settings">
+    <div class="sec-head">
+      <span class="glyph">◈ 08</span>
+      <h2>Pengaturan</h2>
+      <span class="tag">daftar game, jam reset, liburan, data</span>
+      <button class="btn ghost" data-act="game:new">+ Game</button>
+    </div>
+    <div class="gamelist" id="gamelist"></div>
+    <div class="settings-grid" id="settings-misc"></div>
   </section>
 
   <footer>
-    <div class="note">Data tersimpan di browser ini (localStorage). Backup berkala disarankan — kalau riwayat browser dibersihkan menyeluruh, datanya bisa ikut terhapus.</div>
-    <button class="btn ghost" onclick="exportData()">⭳ Backup</button>
-    <button class="btn ghost" onclick="document.getElementById('imp').click()">⭱ Restore</button>
-    <input type="file" id="imp" accept="application/json" style="display:none" onchange="importData(this)">
+    <div class="note">
+      Data tersimpan di browser ini (localStorage). Backup berkala disarankan —
+      kalau riwayat browser dibersihkan menyeluruh, datanya bisa ikut terhapus.
+      <span id="storage-info"></span>
+    </div>
+    <button class="btn ghost" data-act="data:export">⭳ Backup</button>
+    <button class="btn ghost" data-act="data:importPick">⭱ Restore</button>
+    <input type="file" id="import-file" accept="application/json" data-change="data:import" hidden>
   </footer>
 
 </div>
-<div class="savebadge" id="savebadge">✓ TERSIMPAN</div>
 
-<script>
-const KEY='markas-gacha';
-const DATA_VERSION=2;
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<div class="modal-root" id="modal-root" hidden></div>
 
-const GAMES=[
-  {id:'endfield', name:'Arknights: Endfield', short:'Endfield', color:'#f5c542'},
-  {id:'genshin',  name:'Genshin Impact',       short:'Genshin',  color:'#4fd8c4'},
-  {id:'wuwa',     name:'Wuthering Waves',      short:'WuWa',     color:'#9be15d'},
-  {id:'hsr',      name:'Honkai: Star Rail',    short:'HSR',      color:'#a78bfa'},
-  {id:'zzz',      name:'Zenless Zone Zero',    short:'ZZZ',      color:'#ff8a3d'},
-  {id:'nte',      name:'Neverness to Everness',short:'NTE',      color:'#ff5fa2'},
-  {id:'sla',      name:'Solo Leveling: ARISE', short:'SL:ARISE', color:'#6d5cff'},
-  {id:'hi3',      name:'Honkai Impact 3rd',    short:'HI3',      color:'#6ec6ff'},
-];
-const PRIO_LABELS=['FOKUS','AKTIF','LOGIN'];
-const TRIP_START='2026-08-02', TRIP_END='2026-08-06';
-
-const DEFAULT_STATE={
-  dataVersion:DATA_VERSION,
-  checks:{},
-  prios:{zzz:0, genshin:0, endfield:1, wuwa:1, hsr:1, nte:2, sla:2, hi3:2},
-  events:[
-    {id:201, name:'💰 PELUNASAN BANYUWANGI Rp 7,17 jt ke Mas Adi', game:'', date:'2026-08-01', money:true},
-    {id:202, name:'✈️ Berangkat Banyuwangi (kereta malam)', game:'', date:'2026-08-02'},
-    {id:203, name:'HSR 4.4 Phase 2 — Cerydra, Anaxa, Aventurine rerun', game:'hsr', date:'2026-08-05'},
-    {id:204, name:'🏠 Pulang — kereta 15:00', game:'', date:'2026-08-06'},
-    {id:205, name:'ZZZ: klaim selector S-Rank + 1.600 Polychrome + 20 Signal Search', game:'zzz', date:'2026-08-07'},
-    {id:206, name:'HSR: klaim Gilgamesh/Archer gratis (kalau belum)', game:'hsr', date:'2026-08-07'},
-    {id:207, name:'Endfield: banner Arcane tutup → Phase 2 Liino mulai', game:'endfield', date:'2026-08-09'},
-    {id:208, name:'⚠️ Genshin 6.7 + event Fontinalia BERAKHIR', game:'genshin', date:'2026-08-11'},
-    {id:209, name:'Genshin 7.0 Snezhnaya rilis (elemen baru)', game:'genshin', date:'2026-08-12'},
-    {id:210, name:'WuWa 3.5 berakhir (Suisui & Aemeath tutup)', game:'wuwa', date:'2026-08-19'},
-    {id:211, name:'NTE 1.2 berakhir', game:'nte', date:'2026-08-19'},
-    {id:212, name:'WuWa 3.6 rilis (Qingxiao, Mengzhou)', game:'wuwa', date:'2026-08-20'},
-    {id:213, name:'HSR 4.5 rilis (Robin Summeretto)', game:'hsr', date:'2026-08-26'},
-  ],
-  budget:{},
-  pity:{},
-  patches:[
-    {game:'endfield', label:'Endfield 1.4 P2 — Liino',   date:'9 Agu'},
-    {game:'genshin',  label:'Genshin 7.0 — Snezhnaya',   date:'12 Agu'},
-    {game:'wuwa',     label:'WuWa 3.6 — Qingxiao',       date:'±20 Agu'},
-    {game:'nte',      label:'NTE 1.3',                   date:'±20 Agu'},
-    {game:'hsr',      label:'HSR 4.5 — Robin Summeretto',date:'±26 Agu'},
-    {game:'zzz',      label:'ZZZ 3.2',                   date:'±9 Sep'},
-  ],
-  story:{
-    endfield:'Ruins in the Miasma — Ch. II, Process VII',
-    genshin :'Sumeru Ch. II — Truth Amongst the Pages of Purana',
-    wuwa    :'Lahai-Roi Ch. III — Segue (To the Stars Yet to Shine)',
-    hsr     :'Act III: Finality I — Memories are the Prelude to Dreams',
-    zzz     :'S1 Bury Your Tears · S2 Ch.1 Where Clouds Embrace the Dawn',
-    nte     :'Fighting with a Dragon — Fated Riddle',
-    sla     :'Expert Ch. 18 — Almighty Shaman, Kargalgan (EP 07)',
-    hi3     :'Part 2, Ch. X — Reunited Under the Light of Faith',
-  },
-  holidayManual:null,
-};
-
-let S=null;
-
-/* ---------- Util ---------- */
-function todayStr(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
-function monthStr(){return todayStr().slice(0,7);}
-function fmtRp(n){return 'Rp '+Number(n||0).toLocaleString('id-ID');}
-function daysUntil(s){const t=new Date(todayStr()+'T00:00:00'),d=new Date(s+'T00:00:00');return Math.round((d-t)/86400000);}
-function gameById(id){return GAMES.find(g=>g.id===id);}
-function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
-
-/* ---------- Persistence (localStorage) ---------- */
-function load(){
-  try{
-    const raw=localStorage.getItem(KEY);
-    S = raw ? {...structuredClone(DEFAULT_STATE), ...JSON.parse(raw)} : structuredClone(DEFAULT_STATE);
-  }catch(e){
-    console.error('Data rusak, memakai default:',e);
-    S=structuredClone(DEFAULT_STATE);
-  }
-  renderAll();
-}
-function save(){
-  try{
-    localStorage.setItem(KEY, JSON.stringify(S));
-    const b=document.getElementById('savebadge');
-    b.classList.add('show'); setTimeout(()=>b.classList.remove('show'),1000);
-  }catch(e){ alert('Gagal menyimpan data: '+e.message); }
-}
-function exportData(){
-  const blob=new Blob([JSON.stringify(S,null,2)],{type:'application/json'});
-  const a=document.createElement('a');
-  a.href=URL.createObjectURL(blob);
-  a.download='markas-gacha-backup-'+todayStr()+'.json';
-  a.click(); URL.revokeObjectURL(a.href);
-}
-function importData(input){
-  const f=input.files[0]; if(!f) return;
-  const r=new FileReader();
-  r.onload=()=>{
-    try{
-      const d=JSON.parse(r.result);
-      if(!d.checks && !d.events) throw new Error('Format tidak dikenali');
-      if(!confirm('Ganti semua data sekarang dengan isi file backup ini?')) return;
-      S={...structuredClone(DEFAULT_STATE), ...d};
-      save(); renderAll();
-      alert('Data berhasil dipulihkan.');
-    }catch(e){ alert('File tidak valid: '+e.message); }
-  };
-  r.readAsText(f); input.value='';
-}
-
-/* ---------- Holiday ---------- */
-function autoHoliday(){const t=todayStr();return t>=TRIP_START&&t<=TRIP_END;}
-function isHoliday(){return S.holidayManual===null?autoHoliday():S.holidayManual;}
-function toggleHoliday(){S.holidayManual=!isHoliday();save();renderAll();}
-function renderHoliday(){
-  const on=isHoliday();
-  document.getElementById('holiday').style.display=on?'block':'none';
-  document.getElementById('hol-on').style.display=on?'none':'inline-block';
-}
-
-/* ---------- Header ---------- */
-function renderHeader(){
-  const d=new Date();
-  document.getElementById('chip-date').innerHTML='<b>'+d.toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long',year:'numeric'})+'</b>';
-  const t=S.checks[todayStr()]||{};
-  document.getElementById('chip-login').textContent=Object.values(t).filter(Boolean).length+'/'+GAMES.length;
-  const dt=daysUntil(TRIP_START), de=daysUntil(TRIP_END);
-  const c=document.getElementById('chip-trip'); c.style.display='inline-block';
-  if(dt>1) c.innerHTML='✈️ Banyuwangi: <b>'+dt+' hari lagi</b>';
-  else if(dt===1) c.innerHTML='✈️ <b>BESOK berangkat!</b> Pelunasan hari ini';
-  else if(dt===0) c.innerHTML='✈️ <b>Hari ini berangkat!</b>';
-  else if(de>=0) c.innerHTML='🌴 <b>Di Banyuwangi</b> — sisa '+de+' hari';
-  else c.style.display='none';
-}
-
-/* ---------- Roster ---------- */
-function streak(gid){
-  let n=0; const t=new Date(todayStr()+'T00:00:00');
-  for(let i=0;i<400;i++){
-    const d=new Date(t); d.setDate(d.getDate()-i);
-    const k=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
-    if(S.checks[k]&&S.checks[k][gid]) n++;
-    else if(i===0) continue; else break;
-  }
-  return n;
-}
-function renderRoster(){
-  const t=todayStr(); if(!S.checks[t]) S.checks[t]={};
-  const hol=isHoliday();
-  const order=[...GAMES].sort((a,b)=>(S.prios[a.id]??2)-(S.prios[b.id]??2));
-  document.getElementById('roster').innerHTML=order.map(g=>{
-    const done=!!S.checks[t][g.id], p=S.prios[g.id]??2, st=streak(g.id);
-    return `<div class="gcard ${done?'done':''}" style="--gc:${g.color}">
-      <div class="ginfo">
-        <div class="gname">${g.name}</div>
-        <div class="gmeta">
-          <span class="prio p${hol?2:p}" onclick="cyclePrio('${g.id}')">${hol?'LOGIN':PRIO_LABELS[p]}</span>
-          <span class="streak">beruntun <b>${st}</b> hari</span>
-        </div>
-      </div>
-      <button class="claim ${done?'stamped':''}" onclick="toggleCheck('${g.id}')">${done?'✓ CLAIMED':'CLAIM'}</button>
-    </div>`;
-  }).join('');
-  renderHeader();
-}
-function toggleCheck(gid){
-  const t=todayStr(); if(!S.checks[t]) S.checks[t]={};
-  S.checks[t][gid]=!S.checks[t][gid]; save(); renderRoster();
-}
-function cyclePrio(gid){S.prios[gid]=((S.prios[gid]??2)+1)%3;save();renderRoster();}
-
-/* ---------- Events ---------- */
-function renderEvents(){
-  const sorted=[...S.events].sort((a,b)=>a.date.localeCompare(b.date));
-  document.getElementById('evlist').innerHTML=sorted.map(ev=>{
-    const d=daysUntil(ev.date), g=gameById(ev.game);
-    const cls=[d<0?'past':(d<=6?'urgent':''), ev.money?'money':''].join(' ');
-    const dtxt=d<0?'lewat':(d===0?'HARI INI':d), dsml=(d<0||d===0)?'':'HARI LAGI';
-    const tgl=new Date(ev.date+'T00:00:00').toLocaleDateString('id-ID',{day:'numeric',month:'short'});
-    return `<div class="ev ${cls}">
-      <div class="days">${dtxt}<small>${dsml}</small></div>
-      <div class="evbody"><div class="evname">${esc(ev.name)}</div>
-      <div class="evsub">${g?g.name+' · ':''}${tgl}</div></div>
-      <button class="del" onclick="delEvent(${ev.id})" title="Hapus">✕</button>
-    </div>`;
-  }).join('');
-  const sel=document.getElementById('ev-game');
-  if(!sel.options.length) sel.innerHTML='<option value="">— Umum —</option>'+GAMES.map(g=>`<option value="${g.id}">${g.name}</option>`).join('');
-}
-function addEvent(){
-  const n=document.getElementById('ev-name').value.trim();
-  const g=document.getElementById('ev-game').value;
-  const d=document.getElementById('ev-date').value;
-  if(!n||!d){alert('Isi nama event dan tanggalnya dulu ya.');return;}
-  S.events.push({id:Date.now(),name:n,game:g,date:d});
-  document.getElementById('ev-name').value=''; document.getElementById('ev-date').value='';
-  save(); renderEvents();
-}
-function delEvent(id){S.events=S.events.filter(e=>e.id!==id);save();renderEvents();}
-function clearPast(){
-  const n=S.events.filter(e=>daysUntil(e.date)<0).length;
-  if(!n){alert('Tidak ada deadline yang sudah lewat.');return;}
-  if(!confirm('Hapus '+n+' deadline yang sudah lewat?'))return;
-  S.events=S.events.filter(e=>daysUntil(e.date)>=0); save(); renderEvents();
-}
-
-/* ---------- Budget ---------- */
-function renderBudget(){
-  const m=monthStr(); if(!S.budget[m]) S.budget[m]=[];
-  const en=S.budget[m], total=en.reduce((a,e)=>a+Number(e.amount||0),0), cap=400000;
-  document.getElementById('bud-month-label').textContent='bulan '+new Date(m+'-01T00:00:00').toLocaleDateString('id-ID',{month:'long',year:'numeric'});
-  const n=document.getElementById('bud-total'); n.textContent=fmtRp(total); n.classList.toggle('over',total>cap);
-  document.getElementById('bud-sisa').textContent= total>cap?('⚠ lewat plafon '+fmtRp(total-cap)):('sisa '+fmtRp(cap-total));
-  const bar=document.getElementById('bud-bar'); bar.style.width=Math.min(100,total/cap*100)+'%'; bar.classList.toggle('over',total>cap);
-  document.getElementById('bud-entries').innerHTML=en.map(e=>
-    `<div class="bud-e"><span class="lbl">${esc(e.label)}</span><span><span class="amt">${fmtRp(e.amount)}</span>
-     <button class="del" onclick="delBudget(${e.id})">✕</button></span></div>`).join('')
-    || '<div class="note" style="margin:0">Belum ada top-up bulan ini — dompet aman. 👍</div>';
-}
-function addBudget(){
-  const l=document.getElementById('bud-lbl').value.trim(), a=Number(document.getElementById('bud-amt').value);
-  if(!l||!a){alert('Isi keterangan dan nominalnya dulu ya.');return;}
-  const m=monthStr(); if(!S.budget[m]) S.budget[m]=[];
-  S.budget[m].push({id:Date.now(),label:l,amount:a});
-  document.getElementById('bud-lbl').value=''; document.getElementById('bud-amt').value='';
-  save(); renderBudget();
-}
-function delBudget(id){const m=monthStr();S.budget[m]=(S.budget[m]||[]).filter(e=>e.id!==id);save();renderBudget();}
-
-/* ---------- Patches / Story / Pity ---------- */
-function renderPatches(){
-  document.getElementById('patchlist').innerHTML=S.patches.map(p=>{
-    const g=gameById(p.game);
-    return `<div class="patch" style="--pc:${g?g.color:'#888'}"><span>${esc(p.label)}</span><span class="pd">${esc(p.date)}</span></div>`;
-  }).join('');
-}
-function renderStory(){
-  document.getElementById('storygrid').innerHTML=GAMES.map(g=>
-    `<div class="story" style="--gc:${g.color}"><span class="sn">${g.short}</span>
-     <input class="sp" value="${esc((S.story&&S.story[g.id])||'')}" placeholder="—"
-       onchange="setStory('${g.id}',this.value)"></div>`).join('');
-}
-function setStory(gid,v){ if(!S.story)S.story={}; S.story[gid]=v; save(); }
-function renderPity(){
-  document.getElementById('pitygrid').innerHTML=GAMES.map(g=>`
-    <div class="pity" style="--gc:${g.color}">
-      <span class="pn">${g.name}</span>
-      <input type="number" min="0" max="999" value="${S.pity[g.id]??''}" placeholder="0" onchange="setPity('${g.id}',this.value)">
-      <span class="plabel">pull</span>
-    </div>`).join('');
-}
-function setPity(gid,v){S.pity[gid]= v===''?undefined:Number(v);save();}
-
-function renderAll(){renderHoliday();renderRoster();renderEvents();renderBudget();renderPatches();renderStory();renderPity();}
-load();
-</script>
+<script type="module" src="js/main.js"></script>
 </body>
 </html>
