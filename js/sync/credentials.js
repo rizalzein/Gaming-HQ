@@ -11,7 +11,7 @@
  * key itu melewati semua kebijakan RLS.
  */
 
-export const SUPABASE_URL      = '';
-export const SUPABASE_ANON_KEY = '';
+export const SUPABASE_URL      = 'https://xftrqaqtxggarbptperc.supabase.co';
+export const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhmdHJxYXF0eGdnYXJicHRwZXJjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU0ODY3NTgsImV4cCI6MjEwMTA2Mjc1OH0.61jQj4oj6m7RnjS1ZdEERCiYgbQ3z_fkA01-odUCy4g';
 
 export const isConfigured = () => Boolean(SUPABASE_URL && SUPABASE_ANON_KEY);
