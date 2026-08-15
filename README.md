@@ -62,7 +62,33 @@ Tidak ada `onclick` inline. Setiap elemen interaktif menandai dirinya:
 di objek itu — tidak perlu menyentuh `main.js`.
 
 Alur perubahan data selalu sama: ubah `S` → panggil `commit()` → state tersimpan
-dan seluruh halaman dirender ulang.
+dan tampilan dirender ulang.
+
+### Navigasi tab
+
+Halaman dibagi jadi lima tab lewat **hash routing** (`#/beranda`, `#/koleksi`,
+`#/jadwal`, `#/gacha`, `#/atur`). Bukan sekadar menyembunyikan elemen: alamatnya
+ikut berubah, sehingga tombol Back berpindah tab alih-alih menutup aplikasi, dan
+tab yang sedang dibuka bertahan saat halaman dimuat ulang — penting untuk PWA
+yang terpasang di HP.
+
+Peta tab ada di `js/main.js`:
+
+```js
+const TABS = [
+  { id: 'beranda', sections: ['sec-daily', 'sec-periodic'] },
+  …
+];
+const RENDERERS = { 'sec-daily': roster.renderRoster, … };
+```
+
+`render()` hanya membangun section pada tab yang sedang tampil — katalog berisi
+50 entri tidak ikut dibangun ulang setiap kali sesuatu di Beranda berubah.
+
+**Menambah section baru** berarti tiga langkah: tulis markup `<section>`-nya di
+`index.html`, daftarkan fungsi render-nya di `RENDERERS`, lalu masukkan id
+section itu ke salah satu entri `TABS`. Kalau langkah terakhir terlewat,
+section-nya tidak akan pernah tampil.
 
 ---
 
