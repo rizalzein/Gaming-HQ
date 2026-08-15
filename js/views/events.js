@@ -1,4 +1,5 @@
 import { S, commit, uid } from '../state.js';
+import { SEED_EVENTS } from '../config.js';
 import { setHTML, esc, byId, clearInputs } from '../util/dom.js';
 import { shortDate } from '../util/format.js';
 import { daysUntil } from '../util/date.js';
@@ -43,6 +44,23 @@ export const actions = {
     S.events = S.events.filter(e => e.id !== id);
     commit();
   },
+  /**
+   * Tambahkan jadwal bawaan yang belum ada. Dicocokkan dari nama + tanggal,
+   * jadi menekannya berkali-kali tidak menggandakan apa pun, dan entri buatan
+   * pengguna sendiri tidak pernah disentuh.
+   */
+  'event:loadSeed'(){
+    const sudahAda = new Set(S.events.map(e => `${e.name}|${e.date}`));
+    const baru = SEED_EVENTS.filter(e => !sudahAda.has(`${e.name}|${e.date}`));
+
+    if (!baru.length){ toast('Semua jadwal bawaan sudah ada.'); return; }
+    if (!confirm(`Tambahkan ${baru.length} jadwal bawaan yang belum ada? Entri buatan Anda tidak disentuh.`)) return;
+
+    S.events.push(...baru.map(e => ({ id: uid(), ...e })));
+    commit();
+    toast(`${baru.length} jadwal ditambahkan.`);
+  },
+
   'event:clearPast'(){
     const stale = S.events.filter(e => daysUntil(e.date) < 0);
     if (!stale.length){ toast('Tidak ada deadline yang sudah lewat.'); return; }

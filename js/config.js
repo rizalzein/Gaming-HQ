@@ -77,28 +77,38 @@ export const SEED_PRIORITIES = {
   zzz: 0, genshin: 0, endfield: 1, wuwa: 1, hsr: 1, nte: 2, sla: 2, hi3: 2,
 };
 
-// Contoh isi untuk pemasangan baru. Agenda pribadi tidak ditaruh di sini —
-// tambahkan lewat UI supaya tersimpan di browser, bukan ikut masuk repo.
+/**
+ * Jadwal bawaan, diperbarui 15 Agustus 2026. Tanggal tanpa tanda adalah tanggal
+ * resmi yang sudah diumumkan; yang bertanda ± masih perkiraan dari siklus patch.
+ *
+ * Agenda pribadi tidak ditaruh di sini — tambahkan lewat UI supaya tersimpan di
+ * browser, bukan ikut masuk repo. Kalau daftar ini sudah usang, tombol
+ * "Muat jadwal bawaan" di section Deadline Event menambahkan yang belum ada
+ * tanpa menyentuh entri buatan Anda sendiri.
+ */
 export const SEED_EVENTS = [
-  { name:'HSR 4.4 Phase 2 — Cerydra, Anaxa, Aventurine rerun', game:'hsr', date:'2026-08-05' },
-  { name:'ZZZ: klaim selector S-Rank + 1.600 Polychrome + 20 Signal Search', game:'zzz', date:'2026-08-07' },
-  { name:'HSR: klaim Gilgamesh/Archer gratis (kalau belum)', game:'hsr',   date:'2026-08-07' },
-  { name:'Endfield: banner Arcane tutup → Phase 2 Liino mulai', game:'endfield', date:'2026-08-09' },
-  { name:'⚠️ Genshin 6.7 + event Fontinalia BERAKHIR',     game:'genshin', date:'2026-08-11' },
-  { name:'Genshin 7.0 Snezhnaya rilis (elemen baru)',       game:'genshin', date:'2026-08-12' },
-  { name:'WuWa 3.5 berakhir (Suisui & Aemeath tutup)',      game:'wuwa',    date:'2026-08-19' },
-  { name:'NTE 1.2 berakhir',                                game:'nte',     date:'2026-08-19' },
-  { name:'WuWa 3.6 rilis (Qingxiao, Mengzhou)',             game:'wuwa',    date:'2026-08-20' },
-  { name:'HSR 4.5 rilis (Robin Summeretto)',                game:'hsr',     date:'2026-08-26' },
+  { name:'NTE 1.3 rilis — Rising from the Moonlit Fog (Zankou)', game:'nte',      date:'2026-08-19' },
+  { name:'WuWa 3.6 rilis — Qingxiao + rerun Denia',              game:'wuwa',     date:'2026-08-20' },
+  { name:'HSR 4.5 rilis — Robin Summeretto (server Asia)',       game:'hsr',      date:'2026-08-26' },
+  { name:'⚠️ Endfield: banner Liino BERAKHIR',                   game:'endfield', date:'2026-08-30' },
+  { name:'⚠️ Genshin 7.0 Fase 1 BERAKHIR — Odette & Arlecchino', game:'genshin',  date:'2026-09-01' },
+  { name:'Endfield 1.5 rilis — Si, Feranmut Proxy (±)',          game:'endfield', date:'2026-09-02' },
+  { name:'NTE 1.3 Fase 2 — Linko',                               game:'nte',      date:'2026-09-09' },
+  { name:'ZZZ 3.2 rilis — Claret',                               game:'zzz',      date:'2026-09-09' },
+  { name:'WuWa 3.6 Fase 2 — Jingran (±)',                        game:'wuwa',     date:'2026-09-10' },
+  { name:'HSR 4.5 Fase 2 — Aventurine Waveflair',                game:'hsr',      date:'2026-09-12' },
+  { name:'⚠️ Genshin 7.0 Fase 2 BERAKHIR — Flins & Ineffa',      game:'genshin',  date:'2026-09-22' },
+  { name:'⚠️ NTE 1.3 BERAKHIR',                                  game:'nte',      date:'2026-09-30' },
+  { name:'⚠️ ZZZ 3.2 Fase 1 BERAKHIR',                           game:'zzz',      date:'2026-09-30' },
 ];
 
 export const SEED_PATCHES = [
-  { game:'endfield', label:'Endfield 1.4 P2 — Liino',    date:'9 Agu' },
-  { game:'genshin',  label:'Genshin 7.0 — Snezhnaya',    date:'12 Agu' },
-  { game:'wuwa',     label:'WuWa 3.6 — Qingxiao',        date:'±20 Agu' },
-  { game:'nte',      label:'NTE 1.3',                    date:'±20 Agu' },
-  { game:'hsr',      label:'HSR 4.5 — Robin Summeretto', date:'±26 Agu' },
-  { game:'zzz',      label:'ZZZ 3.2',                    date:'±9 Sep' },
+  { game:'nte',      label:'NTE 1.3 — Moonlit Fog',        date:'19 Agu' },
+  { game:'wuwa',     label:'WuWa 3.6 — Qingxiao',          date:'20 Agu' },
+  { game:'hsr',      label:'HSR 4.5 — Robin Summeretto',   date:'26 Agu' },
+  { game:'endfield', label:'Endfield 1.5 — Si',            date:'±2 Sep' },
+  { game:'zzz',      label:'ZZZ 3.2 — Claret',             date:'9 Sep' },
+  { game:'genshin',  label:'Genshin 7.1',                  date:'±23 Sep' },
 ];
 
 // Posisi story diisi sendiri lewat ◈ 06 — sengaja dikosongkan agar progres

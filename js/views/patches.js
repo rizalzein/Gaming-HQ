@@ -1,7 +1,9 @@
 import { S, commit, uid } from '../state.js';
+import { SEED_PATCHES } from '../config.js';
 import { setHTML, esc } from '../util/dom.js';
 import { openModal, field, input, select } from '../ui/modal.js';
 import { gameById } from '../domain.js';
+import { toast } from '../ui/toast.js';
 
 const gameOptions = () => [{ v: '', l: '— Umum —' }, ...S.games.map(g => ({ v: g.id, l: g.name }))];
 
@@ -46,6 +48,19 @@ function patchModal(patch){
 
 export const actions = {
   'patch:new'(){ patchModal(null); },
+
+  /** Sama seperti event: hanya menambahkan yang belum ada, tidak menggandakan. */
+  'patch:loadSeed'(){
+    const sudahAda = new Set(S.patches.map(p => `${p.label}|${p.date}`));
+    const baru = SEED_PATCHES.filter(p => !sudahAda.has(`${p.label}|${p.date}`));
+
+    if (!baru.length){ toast('Semua jadwal patch bawaan sudah ada.'); return; }
+    if (!confirm(`Tambahkan ${baru.length} jadwal patch yang belum ada? Entri buatan Anda tidak disentuh.`)) return;
+
+    S.patches.push(...baru.map(p => ({ id: uid(), ...p })));
+    commit();
+    toast(`${baru.length} jadwal patch ditambahkan.`);
+  },
   'patch:edit'({ id }){
     const patch = S.patches.find(p => p.id === id);
     if (patch) patchModal(patch);
