@@ -16,22 +16,65 @@ import { init as initSync, onSyncChange } from './sync/sync.js';
 
 const views = [header, roster, tasks, events, budget, patches, story, pity, settings, syncView];
 
-const actions = Object.assign({}, ...views.map(v => v.actions ?? {}));
+const actions = Object.assign({}, ...views.map(v => v.actions ?? {}), {
+  'nav:go'({ tab }){ location.hash = '#/' + tab; },
+});
 const changes = Object.assign({}, ...views.map(v => v.changes ?? {}));
 const submits = Object.assign({}, ...views.map(v => v.submits ?? {}));
 
+/* ---- Routing sisi klien ----
+ * Aplikasi tetap satu halaman; tab hanya memilih section mana yang tampil.
+ * Alamatnya ikut berubah (#/koleksi) supaya tombol Back di HP berfungsi dan
+ * tab yang sedang dibuka bertahan saat halaman dimuat ulang.
+ */
+const TABS = [
+  { id: 'beranda', sections: ['sec-daily',  'sec-periodic'] },
+  { id: 'koleksi', sections: ['sec-story',  'sec-catalog']  },
+  { id: 'jadwal',  sections: ['sec-events', 'sec-patches']  },
+  { id: 'gacha',   sections: ['sec-budget', 'sec-pity']     },
+  { id: 'atur',    sections: ['sec-settings', 'sec-sync']   },
+];
+
+const RENDERERS = {
+  'sec-daily'   : roster.renderRoster,
+  'sec-periodic': tasks.renderPeriodic,
+  'sec-story'   : story.renderStory,
+  'sec-catalog' : settings.renderCatalog,
+  'sec-events'  : events.renderEvents,
+  'sec-patches' : patches.renderPatches,
+  'sec-budget'  : budget.renderBudget,
+  'sec-pity'    : pity.renderPity,
+  'sec-settings': settings.renderSettings,
+  'sec-sync'    : syncView.renderSync,
+};
+
+function currentTab(){
+  const id = location.hash.replace(/^#\/?/, '');
+  return TABS.find(t => t.id === id) ?? TABS[0];
+}
+
+function applyTab(active){
+  for (const tab of TABS){
+    const tampil = tab === active;
+    for (const id of tab.sections){
+      const el = document.getElementById(id);
+      if (el) el.hidden = !tampil;
+    }
+  }
+  for (const btn of document.querySelectorAll('#tabbar button')){
+    const on = btn.dataset.tab === active.id;
+    btn.classList.toggle('on', on);
+    btn.setAttribute('aria-current', on ? 'page' : 'false');
+  }
+}
+
 function render(){
+  const active = currentTab();
   header.renderHeader();
-  roster.renderRoster();
-  tasks.renderPeriodic();
-  events.renderEvents();
-  budget.renderBudget();
-  patches.renderPatches();
-  story.renderStory();
-  pity.renderPity();
-  settings.renderCatalog();
-  settings.renderSettings();
-  syncView.renderSync();
+  applyTab(active);
+  // Hanya section yang tampil yang dirender — katalog 50 item tidak perlu
+  // dibangun ulang setiap kali sesuatu di Beranda berubah.
+  for (const id of active.sections) RENDERERS[id]?.();
 }
 
 /* ---- Event delegation: satu listener untuk seluruh app ---- */
@@ -74,10 +117,17 @@ else if (dariKunciLama) toast('Data dipindahkan ke penyimpanan Gaming HQ.');
 onSyncChange(syncView.renderSync);
 initSync().catch(err => console.warn('Sync gagal inisialisasi:', err));
 
+// Pindah tab: render ulang lalu kembali ke atas, supaya tidak mendarat di
+// tengah halaman mengikuti posisi gulir tab sebelumnya.
+window.addEventListener('hashchange', () => {
+  render();
+  window.scrollTo({ top: 0 });
+});
+
 // Hitung mundur reset dan pergantian hari-game.
 setInterval(() => {
   header.renderHeader();
-  roster.renderRoster();
+  if (currentTab().id === 'beranda') roster.renderRoster();
 }, 60_000);
 
 // Kembali dari background (umum di HP) — pastikan tampilan tidak basi.
