@@ -4,7 +4,7 @@
  */
 
 export const STORAGE_KEY    = 'gaming-hq';
-export const SCHEMA_VERSION = 3;
+export const SCHEMA_VERSION = 4;
 
 /**
  * Kunci lama dari masa aplikasi ini bernama Markas Gacha. Dibaca sekali saat
@@ -27,7 +27,7 @@ export const TZ_CHOICES = [
   { v: 420,  l: 'UTC+7 — WIB / server SEA' },
   { v: 480,  l: 'UTC+8 — server Asia (HoYo, Kuro)' },
   { v: 540,  l: 'UTC+9 — server Korea / Jepang' },
-  { v: 0,    l: 'UTC+0 — server Eropa' },
+  { v: 0,    l: 'UTC+0 — GMT / reset serentak sedunia' },
   { v: -300, l: 'UTC-5 — server Amerika' },
 ];
 
@@ -59,8 +59,13 @@ export const GAME_PRESETS = [
     ] },
   { id:'hsr',      name:'Honkai: Star Rail',       short:'HSR',      color:'#a78bfa', banners: HOYO_BANNERS },
   { id:'zzz',      name:'Zenless Zone Zero',       short:'ZZZ',      color:'#ff8a3d', banners: HOYO_BANNERS },
-  { id:'nte',      name:'Neverness to Everness',   short:'NTE',      color:'#ff5fa2', banners: GENERIC_BANNERS },
-  { id:'sla',      name:'Solo Leveling: ARISE',    short:'SL:ARISE', color:'#6d5cff', banners: GENERIC_BANNERS },
+  // NTE reset 05:00 waktu server, bukan 04:00 seperti kebanyakan judul lain.
+  { id:'nte',      name:'Neverness to Everness',   short:'NTE',      color:'#ff5fa2', banners: GENERIC_BANNERS,
+    reset: { tz: 480, hour: 5 } },
+  // Solo Leveling: ARISE tidak memakai server regional — resetnya serentak
+  // sedunia pada 00:00 UTC (07:00 WIB).
+  { id:'sla',      name:'Solo Leveling: ARISE',    short:'SL:ARISE', color:'#6d5cff', banners: GENERIC_BANNERS,
+    reset: { tz: 0, hour: 0 } },
   { id:'hi3',      name:'Honkai Impact 3rd',       short:'HI3',      color:'#6ec6ff', banners: [
       b('limited',  'Expansion Supply', 90, 74, false),
       b('standard', 'Standar',          90, 74, false),

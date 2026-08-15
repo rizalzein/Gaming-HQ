@@ -1,5 +1,5 @@
 import { S, commit, uid, loginTaskId, replaceState, defaultState, serialize, storageSizeKB } from '../state.js';
-import { TZ_CHOICES, PRIO_LABELS, GAME_PRESETS, STORAGE_KEY, LEGACY_STORAGE_KEY } from '../config.js';
+import { TZ_CHOICES, PRIO_LABELS, GAME_PRESETS, STORAGE_KEY, LEGACY_STORAGE_KEY, DEFAULT_RESET } from '../config.js';
 import { setHTML, esc, byId } from '../util/dom.js';
 import { tzLabel, hourLabel } from '../util/format.js';
 import { localDayKey } from '../util/date.js';
@@ -153,7 +153,7 @@ function newGameModal(){
         game = {
           id: preset.id, name: preset.name, short: preset.short, color: preset.color,
           enabled: true, priority: 2,
-          reset: { tz: 480, hour: 4 },
+          reset: { ...DEFAULT_RESET, ...(preset.reset ?? {}) },
           banners: preset.banners.map(b => ({ ...b })),
         };
       } else {
@@ -164,7 +164,7 @@ function newGameModal(){
         game = {
           id, name, short: name.slice(0, 10), color: '#57e6ff',
           enabled: true, priority: 2,
-          reset: { tz: 480, hour: 4 },
+          reset: { ...DEFAULT_RESET },
           banners: [{ id: 'limited', label: 'Karakter (limited)', hard: 90, soft: 74, fifty: true }],
         };
       }

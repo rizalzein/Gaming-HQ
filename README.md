@@ -76,8 +76,22 @@ reset server tiap game**. Tiap game punya `reset: { tz, hour }` — default
 - Mingguan berganti tiap **Senin** pada jam reset.
 - Bulanan berganti tiap tanggal 1 pada jam reset.
 
-Jam reset bisa diubah per game di **◈ 08 Pengaturan → ✎**. Verifikasi sendiri
-untuk tiap judul — nilai default belum tentu benar untuk semua game.
+Jam reset bisa diubah per game di **◈ 08 Pengaturan → ✎**.
+
+Nilai bawaan per game (diperiksa Agustus 2026, asumsi **server Asia** untuk
+judul yang punya server regional):
+
+| Game | Reset |
+|---|---|
+| Genshin, HSR, ZZZ, HI3 | 04:00 UTC+8 |
+| Arknights: Endfield | 04:00 UTC+8 |
+| Wuthering Waves | 04:00 UTC+8 |
+| Neverness to Everness | **05:00** UTC+8 |
+| Solo Leveling: ARISE | **00:00 UTC** — tanpa server regional, serentak sedunia |
+
+Kalau Anda bermain di server America atau Europe, ubah timezone-nya: jamnya
+tetap sama, yang berbeda hanya zona (Europe UTC+1, America UTC-5). Solo
+Leveling: ARISE pengecualian — resetnya sama untuk semua pemain di dunia.
 
 Hal yang sama berlaku untuk angka **soft/hard pity**: nilai bawaan adalah angka
 yang umum beredar, sebagian masih perkiraan untuk game baru. Semuanya bisa

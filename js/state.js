@@ -38,7 +38,7 @@ function makeGame(preset){
     color: preset.color,
     enabled: true,
     priority: SEED_PRIORITIES[preset.id] ?? 2,
-    reset: { ...DEFAULT_RESET },
+    reset: { ...DEFAULT_RESET, ...(preset.reset ?? {}) },
     banners: preset.banners.map(x => ({ ...x })),
   };
 }
@@ -144,10 +144,38 @@ function fillGaps(s){
   return out;
 }
 
+/**
+ * v3 menyeragamkan jam reset semua game ke 04:00 UTC+8. Dua di antaranya
+ * ternyata berbeda: NTE reset 05:00 waktu server, dan Solo Leveling: ARISE
+ * tidak memakai server regional sama sekali — resetnya serentak 00:00 UTC.
+ *
+ * Koreksi hanya diterapkan kalau nilainya masih default lama persis, supaya
+ * penyetelan manual yang sudah diubah pengguna tidak ikut tertimpa.
+ */
+const V4_RESET_FIX = {
+  nte: { tz: 480, hour: 5 },
+  sla: { tz: 0,   hour: 0 },
+};
+
+function toV4(s){
+  if (!Array.isArray(s.games)) return s;
+  for (const game of s.games){
+    const fix = V4_RESET_FIX[game.id];
+    if (!fix) continue;
+    const { tz, hour } = game.reset ?? {};
+    if (tz === 480 && hour === 4) game.reset = { ...fix };
+  }
+  return s;
+}
+
 export function migrate(raw){
   if (!raw || typeof raw !== 'object') return defaultState();
+
   const version = raw.version ?? raw.dataVersion ?? 1;
-  return fillGaps(version >= 3 ? raw : fromLegacy(raw));
+  let s = raw;
+  if (version < 3) s = fromLegacy(s);
+  if (version < 4) s = toV4(s);
+  return fillGaps(s);
 }
 
 /* ---------------- Persistence ---------------- */
