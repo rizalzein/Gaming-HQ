@@ -4,22 +4,50 @@ import { setHTML, esc, byId } from '../util/dom.js';
 import { tzLabel, hourLabel } from '../util/format.js';
 import { localDayKey } from '../util/date.js';
 import { openModal, field, input, select } from '../ui/modal.js';
-import { gameById } from '../domain.js';
+import { gameById, activeGames, catalogGames } from '../domain.js';
 import { toast } from '../ui/toast.js';
 
 /* ---------------- Daftar game ---------------- */
 
 export function renderSettings(){
-  setHTML('gamelist', S.games.length ? S.games.map(g => `
+  const games = activeGames();
+  setHTML('gamelist', games.length ? games.map(g => `
     <div class="grow ${g.enabled ? '' : 'off'}" style="--gc:${esc(g.color)}">
       <div class="gn">${esc(g.name)}</div>
       <span class="gr">${esc(hourLabel(g.reset.hour))} ${esc(tzLabel(g.reset.tz))}</span>
       <button type="button" class="del" data-act="game:toggle" data-id="${esc(g.id)}"
               title="${g.enabled ? 'Nonaktifkan' : 'Aktifkan'}">${g.enabled ? '◉' : '○'}</button>
+      <button type="button" class="del" data-act="game:demote" data-id="${esc(g.id)}"
+              title="Pindahkan ke katalog ${esc(g.platform)}">↓</button>
       <button type="button" class="del" data-act="game:edit" data-id="${esc(g.id)}" title="Ubah">✎</button>
-    </div>`).join('') : '<div class="empty">Belum ada game. Tekan “+ Game”.</div>');
+    </div>`).join('') : '<div class="empty">Belum ada game aktif. Tekan “+ Game” atau ambil dari ◈ 08 Katalog.</div>');
 
   renderMisc();
+}
+
+/** ◈ 08 — daftar ringkas koleksi, tanpa tombol claim dan tanpa pelacakan. */
+export function renderCatalog(){
+  const grup = [
+    { key: 'mobile', label: 'Mobile' },
+    { key: 'steam',  label: 'Steam'  },
+  ];
+
+  setHTML('catalog', grup.map(({ key, label }) => {
+    const daftar = catalogGames(key);
+    const isi = daftar.length
+      ? `<div class="catgrid">${daftar.map(g => `
+          <div class="catitem" style="--gc:${esc(g.color)}">
+            <span class="cn" title="${esc(g.name)}">${esc(g.name)}</span>
+            <button type="button" class="catmove" data-act="game:promote" data-id="${esc(g.id)}"
+                    title="Jadikan game aktif dan lacak harian">↑</button>
+          </div>`).join('')}</div>`
+      : '<div class="empty">Kosong — semuanya sudah dipindah ke aktif.</div>';
+
+    return `<div class="catgroup">
+      <h4>${esc(label)} <span class="catcount">${daftar.length}</span></h4>
+      ${isi}
+    </div>`;
+  }).join(''));
 }
 
 function renderMisc(){
@@ -152,7 +180,7 @@ function newGameModal(){
       if (preset){
         game = {
           id: preset.id, name: preset.name, short: preset.short, color: preset.color,
-          enabled: true, priority: 2,
+          enabled: true, priority: 2, category: 'aktif', platform: 'mobile',
           reset: { ...DEFAULT_RESET, ...(preset.reset ?? {}) },
           banners: preset.banners.map(b => ({ ...b })),
         };
@@ -163,7 +191,7 @@ function newGameModal(){
         while (S.games.some(g => g.id === id)) id += '-2';
         game = {
           id, name, short: name.slice(0, 10), color: '#57e6ff',
-          enabled: true, priority: 2,
+          enabled: true, priority: 2, category: 'aktif', platform: 'mobile',
           reset: { ...DEFAULT_RESET },
           banners: [{ id: 'limited', label: 'Karakter (limited)', hard: 90, soft: 74, fifty: true }],
         };
@@ -225,6 +253,34 @@ export const actions = {
     if (!game) return;
     game.enabled = !game.enabled;
     commit();
+  },
+
+  /** Katalog → aktif. Tugas login dibuat di sini karena katalog tidak punya. */
+  'game:promote'({ id }){
+    const game = gameById(id);
+    if (!game) return;
+    game.category = 'aktif';
+    game.enabled  = true;
+    if (!S.tasks.some(t => t.id === loginTaskId(game.id))){
+      S.tasks.push({ id: loginTaskId(game.id), gameId: game.id, label: 'Login harian', cadence: 'daily', builtin: true });
+    }
+    commit();
+    toast(`${game.name} kini dilacak harian.`);
+  },
+
+  /**
+   * Aktif → katalog. Tugas login bawaan dibuang, tapi tugas buatan pengguna
+   * dan riwayat centang dibiarkan utuh — kalau game ini dipromosikan lagi,
+   * streak dan tugasnya kembali seperti semula.
+   */
+  'game:demote'({ id }){
+    const game = gameById(id);
+    if (!game) return;
+    if (!confirm(`Pindahkan ${game.name} ke katalog ${game.platform}? Streak dan riwayatnya disimpan.`)) return;
+    game.category = game.platform ?? 'mobile';
+    S.tasks = S.tasks.filter(t => t.id !== loginTaskId(game.id));
+    commit();
+    toast(`${game.name} dipindah ke katalog.`);
   },
   'holiday:auto'(){ S.holiday.mode = null; commit(); },
   'data:export': exportData,

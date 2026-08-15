@@ -2,9 +2,11 @@ import { S, commit, uid } from '../state.js';
 import { CADENCE_LABELS } from '../config.js';
 import { setHTML, setText, esc } from '../util/dom.js';
 import { openModal, field, input, select } from '../ui/modal.js';
-import { periodicTasks, isDone, toggleTask, gameById, taskById } from '../domain.js';
+import { periodicTasks, isDone, toggleTask, gameById, taskById, activeGames } from '../domain.js';
 
-const gameOptions = () => [{ v: '', l: '— Umum —' }, ...S.games.map(g => ({ v: g.id, l: g.name }))];
+// Hanya game aktif — game katalog tidak dilacak, jadi tidak masuk akal
+// dipasangi tugas berulang.
+const gameOptions = () => [{ v: '', l: '— Umum —' }, ...activeGames().map(g => ({ v: g.id, l: g.name }))];
 
 const cadenceOptions = Object.entries(CADENCE_LABELS).map(([v, l]) => ({ v, l }));
 

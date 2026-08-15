@@ -107,6 +107,18 @@
 .pity .pbar i{display:block;height:100%;background:linear-gradient(90deg,var(--cyan),var(--mag))}
 .pity .pbar i.soft{background:linear-gradient(90deg,var(--gold),var(--red))}
 
+/* ---- Katalog game ---- */
+.catgroup{margin-bottom:16px}
+.catgroup h4{font-family:var(--font-display);font-size:.75rem;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.catcount{font-family:var(--font-display);font-size:.66rem;letter-spacing:.04em;color:var(--cyan);border:1px solid rgba(87,230,255,.3);background:rgba(87,230,255,.08);border-radius:999px;padding:1px 9px}
+.catgrid{display:grid;grid-template-columns:1fr;gap:6px}
+@media(min-width:520px){.catgrid{grid-template-columns:1fr 1fr}}
+@media(min-width:800px){.catgrid{grid-template-columns:1fr 1fr 1fr}}
+.catitem{display:flex;align-items:center;gap:6px;min-width:0;background:var(--card);border:1px solid var(--line);border-left:3px solid var(--gc,#6a739f);border-radius:8px;padding:7px 9px;font-size:.76rem}
+.catitem .cn{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--dim)}
+.catmove{flex:none;width:24px;height:24px;display:grid;place-items:center;background:none;border:1px solid var(--line);border-radius:6px;color:var(--faint);font-size:.8rem;line-height:1;cursor:pointer}
+.catmove:hover{border-color:var(--green);color:var(--green);background:rgba(126,240,166,.1)}
+
 /* ---- Settings / daftar game ---- */
 .gamelist{display:grid;grid-template-columns:1fr;gap:8px}
 @media(min-width:640px){.gamelist{grid-template-columns:1fr 1fr}}

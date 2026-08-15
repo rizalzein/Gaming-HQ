@@ -1,11 +1,25 @@
 /** Logika turunan di atas state: periode tugas, streak, prioritas, pity. */
 
-import { S, loginTaskId } from './state.js';
+import { S, loginTaskId, isActive } from './state.js';
 import { DEFAULT_RESET } from './config.js';
 import { periodKey, dayKey, addDays, localDayKey } from './util/date.js';
 
-export const gameById     = id => S.games.find(g => g.id === id);
-export const enabledGames = ()  => S.games.filter(g => g.enabled);
+export const gameById = id => S.games.find(g => g.id === id);
+
+/**
+ * Login Harian, chip hitungan, streak, story, dan pity semuanya bertumpu pada
+ * fungsi ini — jadi hanya game berkategori 'aktif' yang ikut dilacak harian.
+ * Game katalog tetap ada di S.games tapi tidak pernah muncul di sini.
+ */
+export const enabledGames = () => S.games.filter(g => isActive(g) && g.enabled);
+
+/** Semua game aktif, termasuk yang dinonaktifkan — untuk daftar di Pengaturan. */
+export const activeGames = () => S.games.filter(isActive);
+
+/** Isi katalog per platform: 'mobile' atau 'steam'. */
+export const catalogGames = platform =>
+  S.games.filter(g => g.category === platform)
+         .sort((a, b) => a.name.localeCompare(b.name));
 
 export const byPriority = () =>
   [...enabledGames()].sort((a, b) => a.priority - b.priority || a.name.localeCompare(b.name));
@@ -61,10 +75,15 @@ export function loginCount(){
 
 const CADENCE_ORDER = { weekly: 0, monthly: 1, daily: 2 };
 
-/** Semua tugas selain login bawaan, untuk section "Tugas Berulang". */
+/**
+ * Semua tugas selain login bawaan, untuk section "Tugas Berulang".
+ * Tugas milik game yang sedang di katalog disembunyikan — bukan dihapus, jadi
+ * ia muncul lagi utuh begitu game-nya dikembalikan ke kategori aktif.
+ */
 export function periodicTasks(){
   return S.tasks
     .filter(t => !t.builtin)
+    .filter(t => !t.gameId || isActive(gameById(t.gameId) ?? {}))
     .sort((a, b) =>
       CADENCE_ORDER[a.cadence] - CADENCE_ORDER[b.cadence] ||
       (gameById(a.gameId)?.priority ?? 9) - (gameById(b.gameId)?.priority ?? 9) ||

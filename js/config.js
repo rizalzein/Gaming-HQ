@@ -4,7 +4,7 @@
  */
 
 export const STORAGE_KEY    = 'gaming-hq';
-export const SCHEMA_VERSION = 4;
+export const SCHEMA_VERSION = 5;
 
 /**
  * Kunci lama dari masa aplikasi ini bernama Markas Gacha. Dibaca sekali saat
@@ -71,6 +71,44 @@ export const GAME_PRESETS = [
       b('standard', 'Standar',          90, 74, false),
     ] },
 ];
+
+/**
+ * Katalog koleksi. Game di sini tidak ikut Login Harian, tidak dihitung di chip
+ * "Login hari ini", dan tidak punya streak maupun pity — hanya daftar nama.
+ * Tekan ↑ di katalog untuk memindahkannya ke kategori 'aktif'.
+ *
+ * `platform` disimpan terpisah dari `category` supaya saat sebuah game
+ * dikembalikan dari 'aktif', ia tahu harus pulang ke daftar mana.
+ */
+const PALETTE = ['#57e6ff', '#ff5fd0', '#ffd166', '#7ef0a6', '#a78bfa', '#ff8a3d', '#6ec6ff', '#9be15d'];
+
+const slug  = s => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+const warna = s => PALETTE[[...s].reduce((n, c) => n + c.charCodeAt(0), 0) % PALETTE.length];
+
+const katalog = (platform, names) =>
+  names.map(name => ({ id: slug(name), name, short: name, color: warna(name), platform }));
+
+export const CATALOG_GAMES = [
+  ...katalog('mobile', [
+    'Arena of Valor', 'Arknights', 'Honor of Kings', 'Magic Chess GO GO',
+    'Mobile Legends Bang Bang', 'Palmon Survival', 'Pokemon Champions',
+    'Pokemon GO', 'Pokemon TCG Pocket', 'Tower of Fantasy',
+  ]),
+  ...katalog('steam', [
+    'Apex Legends', "Assassin's Creed Unity", 'Battlefield 1', 'Battlefield 2042',
+    'Battlefield 4', 'Battlefield V', 'Black Desert', 'Call of Duty',
+    "Conqueror's Blade", 'Counter-Strike 2', 'Delta Force', 'Destiny 2', 'Dota 2',
+    'EA Sports FC 25', 'The Finals', 'The First Descendant', 'For Honor',
+    'FragPunk', 'Halo Infinite', 'Just Cause 3', 'Marvel Rivals',
+    'Naraka Bladepoint', 'Once Human', 'Overwatch', 'Palworld', 'Path of Exile',
+    'Payday 2', 'PSO2 New Genesis', 'PUBG Battlegrounds', 'Snowbreak',
+    'Star Wars Battlefront II', 'SW Jedi Fallen Order', 'SW The Old Republic',
+    'Strinova', 'Suicide Squad KTJL', 'War Thunder', 'Warframe',
+    'Where Winds Meet', 'The Witcher 3', 'Sword of Justice',
+  ]),
+];
+
+export const CATEGORY_LABELS = { aktif: 'Aktif', mobile: 'Mobile', steam: 'Steam' };
 
 /** Prioritas awal per game (0 = FOKUS, 1 = AKTIF, 2 = LOGIN). */
 export const SEED_PRIORITIES = {

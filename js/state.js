@@ -7,7 +7,7 @@
  */
 
 import {
-  STORAGE_KEY, LEGACY_STORAGE_KEY, SCHEMA_VERSION, GAME_PRESETS, DEFAULT_RESET,
+  STORAGE_KEY, LEGACY_STORAGE_KEY, SCHEMA_VERSION, GAME_PRESETS, CATALOG_GAMES, DEFAULT_RESET,
   DEFAULT_BUDGET_CAP, SEED_PRIORITIES, SEED_EVENTS, SEED_PATCHES, SEED_STORY, SEED_HOLIDAY,
 } from './config.js';
 
@@ -38,19 +38,40 @@ function makeGame(preset){
     color: preset.color,
     enabled: true,
     priority: SEED_PRIORITIES[preset.id] ?? 2,
+    category: 'aktif',                       // hanya kategori ini yang dilacak harian
+    platform: preset.platform ?? 'mobile',   // tujuan pulang saat dikeluarkan dari 'aktif'
     reset: { ...DEFAULT_RESET, ...(preset.reset ?? {}) },
     banners: preset.banners.map(x => ({ ...x })),
   };
 }
 
+/** Entri katalog: hanya nama dan platform, tanpa banner dan tanpa pelacakan. */
+export function makeCatalogGame(entry){
+  return {
+    id: entry.id,
+    name: entry.name,
+    short: entry.short,
+    color: entry.color,
+    enabled: true,
+    priority: 2,
+    category: entry.platform,
+    platform: entry.platform,
+    reset: { ...DEFAULT_RESET },
+    banners: [],
+  };
+}
+
+export const isActive = game => game.category === 'aktif';
+
 export function loginTaskId(gameId){ return `${gameId}:login`; }
 
 export function defaultState(){
-  const games = GAME_PRESETS.map(makeGame);
+  const games = [...GAME_PRESETS.map(makeGame), ...CATALOG_GAMES.map(makeCatalogGame)];
   return {
     version : SCHEMA_VERSION,
     games,
-    tasks   : games.flatMap(g => [
+    // Tugas hanya dibuat untuk game aktif — katalog tidak ikut dilacak.
+    tasks   : games.filter(isActive).flatMap(g => [
       { id: loginTaskId(g.id), gameId: g.id, label: 'Login harian', cadence: 'daily', builtin: true },
       { id: uid(),             gameId: g.id, label: 'Misi mingguan', cadence: 'weekly' },
     ]),
@@ -115,12 +136,15 @@ function fillGaps(s){
     ...g,
     enabled : g.enabled !== false,
     priority: Number.isInteger(g.priority) ? g.priority : 2,
+    category: g.category ?? 'aktif',
+    platform: g.platform ?? 'mobile',
     reset   : { ...DEFAULT_RESET, ...(g.reset || {}) },
     banners : Array.isArray(g.banners) ? g.banners : [],
   }));
 
   out.tasks = Array.isArray(s.tasks) ? s.tasks.filter(t => t && t.id) : d.tasks;
   for (const g of out.games){
+    if (!isActive(g)) continue;              // katalog tidak perlu tugas login
     if (!out.tasks.some(t => t.id === loginTaskId(g.id))){
       out.tasks.push({ id: loginTaskId(g.id), gameId: g.id, label: 'Login harian', cadence: 'daily', builtin: true });
     }
@@ -168,6 +192,29 @@ function toV4(s){
   return s;
 }
 
+/**
+ * v5 memperkenalkan kategori. Semua game yang sudah ada dianggap 'aktif' —
+ * artinya Login Harian tidak berubah sama sekali — lalu katalog koleksi
+ * ditambahkan sebagai game berkategori 'mobile' / 'steam'.
+ *
+ * Entri yang id-nya sudah ada dilewati, jadi migrasi ini aman dijalankan
+ * berulang dan tidak menggandakan apa pun.
+ */
+function toV5(s){
+  if (!Array.isArray(s.games)) return s;
+
+  for (const game of s.games){
+    game.category ??= 'aktif';
+    game.platform ??= 'mobile';
+  }
+
+  const sudahAda = new Set(s.games.map(g => g.id));
+  for (const entry of CATALOG_GAMES){
+    if (!sudahAda.has(entry.id)) s.games.push(makeCatalogGame(entry));
+  }
+  return s;
+}
+
 export function migrate(raw){
   if (!raw || typeof raw !== 'object') return defaultState();
 
@@ -175,6 +222,7 @@ export function migrate(raw){
   let s = raw;
   if (version < 3) s = fromLegacy(s);
   if (version < 4) s = toV4(s);
+  if (version < 5) s = toV5(s);
   return fillGaps(s);
 }
 

@@ -2,10 +2,10 @@ import { S, commit, uid } from '../state.js';
 import { SEED_PATCHES } from '../config.js';
 import { setHTML, esc } from '../util/dom.js';
 import { openModal, field, input, select } from '../ui/modal.js';
-import { gameById } from '../domain.js';
+import { gameById, activeGames } from '../domain.js';
 import { toast } from '../ui/toast.js';
 
-const gameOptions = () => [{ v: '', l: '— Umum —' }, ...S.games.map(g => ({ v: g.id, l: g.name }))];
+const gameOptions = () => [{ v: '', l: '— Umum —' }, ...activeGames().map(g => ({ v: g.id, l: g.name }))];
 
 export function renderPatches(){
   setHTML('patchlist', S.patches.length ? S.patches.map(p => {

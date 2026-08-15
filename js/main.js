@@ -29,6 +29,7 @@ function render(){
   patches.renderPatches();
   story.renderStory();
   pity.renderPity();
+  settings.renderCatalog();
   settings.renderSettings();
   syncView.renderSync();
 }

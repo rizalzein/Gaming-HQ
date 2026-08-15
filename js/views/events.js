@@ -3,7 +3,7 @@ import { SEED_EVENTS } from '../config.js';
 import { setHTML, esc, byId, clearInputs } from '../util/dom.js';
 import { shortDate } from '../util/format.js';
 import { daysUntil } from '../util/date.js';
-import { gameById } from '../domain.js';
+import { gameById, activeGames } from '../domain.js';
 import { toast } from '../ui/toast.js';
 
 export function renderEvents(){
@@ -35,7 +35,7 @@ function syncGameSelect(){
   if (!sel) return;
   const current = sel.value;
   sel.innerHTML = '<option value="">— Umum —</option>' +
-    S.games.map(g => `<option value="${esc(g.id)}">${esc(g.name)}</option>`).join('');
+    activeGames().map(g => `<option value="${esc(g.id)}">${esc(g.name)}</option>`).join('');
   if (current) sel.value = current;
 }
 

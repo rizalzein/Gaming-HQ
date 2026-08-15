@@ -2,7 +2,7 @@
  * Service worker offline-first.
  * Naikkan VERSION setiap kali file di PRECACHE berubah agar klien mengambil versi baru.
  */
-const VERSION = 'v5';
+const VERSION = 'v6';
 const CACHE   = `gaming-hq-${VERSION}`;
 const VENDOR  = `gaming-hq-vendor`;      // font + supabase-js dari CDN
 
