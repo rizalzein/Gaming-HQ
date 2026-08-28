@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
   Server statis kecil untuk pengembangan lokal Gaming Headquarters.
 
