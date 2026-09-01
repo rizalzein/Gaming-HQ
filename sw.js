@@ -2,7 +2,7 @@
  * Service worker offline-first.
  * Naikkan VERSION setiap kali file di PRECACHE berubah agar klien mengambil versi baru.
  */
-const VERSION = 'v6';
+const VERSION = 'v7';
 const CACHE   = `gaming-hq-${VERSION}`;
 const VENDOR  = `gaming-hq-vendor`;      // font + supabase-js dari CDN
 
@@ -33,6 +33,7 @@ const PRECACHE = [
   'js/views/pity.js',
   'js/views/settings.js',
   'js/views/sync.js',
+  'js/reminder.js',
   'js/sync/credentials.js',
   'js/sync/client.js',
   'js/sync/sync.js',
@@ -116,3 +117,17 @@ async function networkFirst(request, cacheName){
     throw err;
   }
 }
+
+// Klik notifikasi: fokuskan jendela yang sudah ada kalau bisa, supaya tidak
+// menumpuk tab baru setiap kali pengingat ditekan.
+self.addEventListener('notificationclick', event => {
+  event.notification.close();
+  event.waitUntil((async () => {
+    const scope = self.registration.scope;
+    const daftar = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
+    for (const klien of daftar){
+      if (klien.url.startsWith(scope) && 'focus' in klien) return klien.focus();
+    }
+    if (self.clients.openWindow) return self.clients.openWindow(scope);
+  })());
+});

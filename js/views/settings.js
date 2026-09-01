@@ -5,6 +5,7 @@ import { tzLabel, hourLabel } from '../util/format.js';
 import { localDayKey } from '../util/date.js';
 import { openModal, field, input, select } from '../ui/modal.js';
 import { gameById, activeGames, catalogGames } from '../domain.js';
+import { LEAD_CHOICES, notifPermission, requestNotif, checkAndNotify } from '../reminder.js';
 import { toast } from '../ui/toast.js';
 
 /* ---------------- Daftar game ---------------- */
@@ -50,6 +51,28 @@ export function renderCatalog(){
   }).join(''));
 }
 
+/**
+ * Teks status izin sengaja menyebutkan batasnya terang-terangan. Pengguna yang
+ * mengira notifikasi akan datang saat aplikasi tertutup akan menyimpulkan
+ * fiturnya rusak, padahal memang tidak mungkin tanpa komponen server.
+ */
+function izinNotifikasi(){
+  const catatan = 'Notifikasi hanya muncul selama aplikasi terbuka — situs statis tidak bisa membangunkan dirinya sendiri saat ditutup.';
+
+  switch (notifPermission()){
+    case 'granted':
+      return `Notifikasi sistem <b>aktif</b>. ${catatan}`;
+    case 'denied':
+      return 'Notifikasi diblokir untuk situs ini. Izinkan lagi lewat pengaturan situs di browser kalau ingin memakainya.';
+    case 'unsupported':
+      return `Browser ini tidak mendukung notifikasi. Peringatan tetap tampil di dalam aplikasi.`;
+    default:
+      return `Peringatan dalam aplikasi sudah aktif.
+        <button type="button" class="btn ghost" data-act="reminder:ask">Aktifkan notifikasi sistem</button>
+        <br>${catatan}`;
+  }
+}
+
 function renderMisc(){
   const h = S.holiday;
   const modeText = h.mode === null ? 'otomatis (ikut tanggal)' : h.mode ? 'dipaksa AKTIF' : 'dipaksa MATI';
@@ -62,6 +85,20 @@ function renderMisc(){
       <div class="setrow"><label>Selesai</label><input type="date" value="${esc(h.end)}" data-change="holiday:end"></div>
       <div class="note" style="margin-top:4px">Status sekarang: <b>${esc(modeText)}</b>.
         ${h.mode === null ? '' : '<button type="button" class="btn ghost" data-act="holiday:auto">Kembalikan ke otomatis</button>'}</div>
+    </div>
+    <div class="setbox">
+      <h4>Pengingat reset</h4>
+      <div class="setrow">
+        <label>Aktif</label>
+        <input type="checkbox" style="width:auto" ${S.reminder.enabled ? 'checked' : ''}
+               data-change="reminder:enabled">
+      </div>
+      <div class="setrow">
+        <label>Ingatkan</label>
+        ${select('lead', LEAD_CHOICES.map(c => ({ v: c.v, l: c.l })), S.reminder.leadMinutes)
+          .replace('<select ', '<select data-change="reminder:lead" ')}
+      </div>
+      <div class="note" style="margin-top:4px">${izinNotifikasi()}</div>
     </div>
     <div class="setbox">
       <h4>Data</h4>
@@ -283,6 +320,17 @@ export const actions = {
     toast(`${game.name} dipindah ke katalog.`);
   },
   'holiday:auto'(){ S.holiday.mode = null; commit(); },
+
+  async 'reminder:ask'(){
+    const hasil = await requestNotif();
+    commit();                                  // status izin ikut dirender ulang
+    if (hasil === 'granted'){
+      toast('Notifikasi sistem diaktifkan.');
+      await checkAndNotify();                  // langsung kirim kalau memang sudah waktunya
+    } else if (hasil === 'denied'){
+      toast('Notifikasi ditolak. Peringatan dalam aplikasi tetap jalan.', 'err');
+    }
+  },
   'data:export': exportData,
   'data:importPick'(){ byId('import-file').click(); },
   'data:reset'(){
@@ -299,6 +347,8 @@ export const actions = {
 };
 
 export const changes = {
+  'reminder:enabled'(ds, el){ S.reminder.enabled = el.checked; commit(); },
+  'reminder:lead'(ds, el){ S.reminder.leadMinutes = Number(el.value) || 120; commit(); },
   'holiday:label'(ds, el){ S.holiday.label = el.value.trim(); commit(); },
   'holiday:start'(ds, el){ S.holiday.start = el.value; commit(); },
   'holiday:end'(ds, el){ S.holiday.end = el.value; commit(); },

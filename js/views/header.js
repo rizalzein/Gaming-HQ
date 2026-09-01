@@ -3,6 +3,7 @@ import { setHTML, esc } from '../util/dom.js';
 import { longDate } from '../util/format.js';
 import { msUntilReset, fmtDuration, daysUntil } from '../util/date.js';
 import { loginCount, enabledGames, isHolidayActive, autoHoliday } from '../domain.js';
+import { remindersDue } from '../reminder.js';
 
 export function renderHeader(){
   const { done, total } = loginCount();
@@ -11,8 +12,9 @@ export function renderHeader(){
     `<span class="chip ${total && done === total ? 'good' : ''}">Login hari ini: <b>${done}/${total}</b></span>`,
   ];
 
+  const due = remindersDue();
   const reset = nextReset();
-  if (reset) chips.push(`<span class="chip">Reset ${esc(reset)}</span>`);
+  if (reset) chips.push(`<span class="chip ${due.length ? 'warn' : ''}">Reset ${esc(reset)}</span>`);
 
   const ev = nextEvent();
   if (ev) chips.push(`<span class="chip warn">${esc(ev)}</span>`);
@@ -20,7 +22,31 @@ export function renderHeader(){
   if (isHolidayActive()) chips.push('<span class="chip warn">🌴 <b>Mode liburan</b></span>');
 
   setHTML('hud', chips.join(''));
+  renderReminderBanner(due);
   renderHolidayBanner();
+}
+
+/**
+ * Peringatan ini yang paling bisa diandalkan — ia selalu benar begitu aplikasi
+ * dibuka. Notifikasi sistem hanya pelengkap, karena tidak bisa dijamin muncul
+ * saat aplikasi tertutup.
+ */
+function renderReminderBanner(due){
+  if (!due.length){
+    setHTML('reminder-banner', '');
+    return;
+  }
+
+  setHTML('reminder-banner', `
+    <div class="reminder">
+      <h3>⏰ RESET SEBENTAR LAGI</h3>
+      <p><b>${due.length} game</b> belum diklaim — paling mendesak
+         <b>${esc(fmtDuration(due[0].ms))}</b> lagi.</p>
+      <ul>${due.map(d =>
+        `<li>${esc(d.game.name)} — ${esc(fmtDuration(d.ms))}</li>`).join('')}</ul>
+      <button type="button" class="btn ghost" data-act="nav:go" data-tab="beranda"
+              style="margin-top:10px">Ke Login Harian</button>
+    </div>`);
 }
 
 function nextReset(){

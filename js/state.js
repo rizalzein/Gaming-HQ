@@ -82,6 +82,7 @@ export function defaultState(){
     story   : { ...SEED_STORY },
     pity    : {},
     holiday : { ...SEED_HOLIDAY, tips: [...SEED_HOLIDAY.tips] },
+    reminder: { enabled: true, leadMinutes: 120 },
   };
 }
 

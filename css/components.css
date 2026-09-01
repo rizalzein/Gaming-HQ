@@ -41,6 +41,13 @@
 .chip.warn{border-color:rgba(255,209,102,.4);color:var(--gold)}
 .chip.good{border-color:rgba(126,240,166,.4);color:var(--green)}
 
+/* ---- Banner pengingat reset ---- */
+.reminder{background:linear-gradient(135deg,rgba(255,209,102,.14),rgba(255,107,122,.10));border:1px solid rgba(255,209,102,.45);border-radius:var(--r);padding:14px 16px;margin-bottom:14px}
+.reminder h3{font-family:var(--font-display);font-size:.9rem;letter-spacing:.06em;margin-bottom:6px;color:var(--gold)}
+.reminder p{font-size:.8rem;color:var(--dim);line-height:1.6}
+.reminder ul{margin:8px 0 0 18px;font-size:.8rem;color:var(--dim);line-height:1.7}
+.reminder li b{color:var(--txt)}
+
 /* ---- Mode liburan ---- */
 .holiday{background:linear-gradient(135deg,rgba(87,230,255,.12),rgba(255,95,208,.10));border:1px solid rgba(87,230,255,.35);border-radius:var(--r);padding:14px 16px;margin-bottom:22px}
 .holiday h3{font-family:var(--font-display);font-size:.9rem;letter-spacing:.06em;margin-bottom:6px}

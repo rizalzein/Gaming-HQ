@@ -13,6 +13,7 @@ import * as settings from './views/settings.js';
 import * as syncView from './views/sync.js';
 
 import { init as initSync, onSyncChange } from './sync/sync.js';
+import { checkAndNotify } from './reminder.js';
 
 const views = [header, roster, tasks, events, budget, patches, story, pity, settings, syncView];
 
@@ -124,11 +125,14 @@ window.addEventListener('hashchange', () => {
   window.scrollTo({ top: 0 });
 });
 
-// Hitung mundur reset dan pergantian hari-game.
+// Hitung mundur reset, pergantian hari-game, dan pengecekan pengingat.
 setInterval(() => {
   header.renderHeader();
   if (currentTab().id === 'beranda') roster.renderRoster();
+  checkAndNotify();
 }, 60_000);
+
+checkAndNotify();   // sekali saat dibuka, tidak menunggu satu menit penuh
 
 // Kembali dari background (umum di HP) — pastikan tampilan tidak basi.
 document.addEventListener('visibilitychange', () => {
