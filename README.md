@@ -18,7 +18,8 @@ perlu disajikan lewat HTTP. Tidak perlu Node atau Python:
 powershell -ExecutionPolicy Bypass -File serve.ps1
 ```
 
-Lalu buka <http://localhost:8123>. Ganti port dengan `-Port 9000` bila perlu.
+Lalu buka <http://localhost:8137>. Port 8123 kini diblokir Windows, jadi bawaannya
+8137 — ganti dengan `-Port 9000` bila perlu.
 
 ---
 
@@ -39,6 +40,7 @@ js/
   config.js              konstanta & data preset (nilai awal saja)
   state.js               localStorage, migrasi skema, backup/restore
   domain.js              logika turunan: periode tugas, streak, pity
+  reminder.js            pengingat sebelum reset (lihat batasnya di bawah)
   util/                  date.js, format.js, dom.js
   ui/                    modal.js, toast.js
   views/                 satu modul per section di halaman
@@ -102,7 +104,7 @@ reset server tiap game**. Tiap game punya `reset: { tz, hour }` — default
 - Mingguan berganti tiap **Senin** pada jam reset.
 - Bulanan berganti tiap tanggal 1 pada jam reset.
 
-Jam reset bisa diubah per game di **◈ 08 Pengaturan → ✎**.
+Jam reset bisa diubah per game di **◈ 09 Pengaturan → ✎**.
 
 Nilai bawaan per game (diperiksa Agustus 2026, asumsi **server Asia** untuk
 judul yang punya server regional):
@@ -125,9 +127,40 @@ diedit per banner lewat modal game.
 
 ---
 
+## Pengingat reset
+
+Peringatan muncul saat ada game aktif yang resetnya sudah masuk ambang tapi
+login hariannya belum diklaim. Ambang diatur di **◈ 09 Pengaturan → Pengingat
+reset**, dari 30 menit sampai 6 jam, dan dihitung **per game** — bukan satu
+waktu global, karena tiap judul punya jam reset sendiri.
+
+Dua lapis, dengan keandalan berbeda:
+
+| Lapis | Kapan bekerja |
+|---|---|
+| Banner + chip kuning di header | Selalu, begitu aplikasi dibuka |
+| Notifikasi sistem | **Hanya selama aplikasi terbuka** |
+
+**Notifikasi tidak akan muncul saat aplikasi ditutup, dan itu bukan bug.**
+Situs statis tidak bisa membangunkan dirinya sendiri: timer di halaman ikut
+mati begitu tab ditutup, dan service worker dihentikan sistem beberapa detik
+setelah idle. Notification Triggers dan Periodic Background Sync tidak bisa
+diandalkan untuk ini — keduanya eksperimental, hanya Chrome/Android, dan
+intervalnya minimal 12 jam.
+
+Untuk notifikasi yang tetap datang saat aplikasi tertutup dibutuhkan **Web Push
+dengan komponen server**: sepasang VAPID key, tabel langganan, Supabase Edge
+Function, dan penjadwal `pg_cron`. Belum dikerjakan.
+
+Detail implementasinya ada di `js/reminder.js`, termasuk alasan penanda
+"sudah diberitahu" disimpan di kunci localStorage terpisah yang sengaja tidak
+ikut sinkron — izin notifikasi bersifat per-perangkat.
+
+---
+
 ## Data & backup
 
-Kunci penyimpanan: `gaming-hq`. Skema saat ini **v3**; data dari versi lama
+Kunci penyimpanan: `gaming-hq`. Skema saat ini **v5**; data dari versi lama
 (v1/v2 — format `checks` / `prios` / `pity` angka tunggal) dimigrasi otomatis
 saat pertama kali dibuka, sekali saja.
 
@@ -139,7 +172,7 @@ terisi. Hal yang sama berlaku untuk metadata sinkronisasi
 (`markas-gacha:sync` → `gaming-hq:sync`).
 
 **Penting:** `localStorage` terikat pada satu origin. Data yang tersimpan saat
-membuka file lewat `file://` **tidak** ikut terbaca di `http://localhost:8123`
+membuka file lewat `file://` **tidak** ikut terbaca di `http://localhost:8137`
 atau di URL GitHub Pages. Untuk memindahkannya: buka versi lama → **⭳ Backup**
 → buka versi baru → **⭱ Restore**. File backup format lama tetap diterima dan
 ikut dimigrasi.
@@ -248,7 +281,7 @@ dibuka, saat kembali dari background, dan saat koneksi pulih.
 
 3. **Authentication → URL Configuration**:
    - *Site URL*: `https://rizalzein.github.io/Gaming-HQ/`
-   - *Redirect URLs*: tambahkan juga `http://localhost:8123/` untuk pengembangan lokal.
+   - *Redirect URLs*: tambahkan juga `http://localhost:8137/` untuk pengembangan lokal.
 
    Tanpa langkah ini, tautan magic link akan ditolak.
 
