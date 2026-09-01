@@ -116,8 +116,9 @@ export const SEED_PRIORITIES = {
 };
 
 /**
- * Jadwal bawaan, diperbarui 15 Agustus 2026. Tanggal tanpa tanda adalah tanggal
- * resmi yang sudah diumumkan; yang bertanda ± masih perkiraan dari siklus patch.
+ * Jadwal bawaan, diperbarui 1 September 2026. Tanggal tanpa tanda adalah
+ * tanggal resmi yang sudah diumumkan; yang bertanda ± masih perkiraan dari
+ * siklus patch dan perlu dicek ulang menjelang harinya.
  *
  * Agenda pribadi tidak ditaruh di sini — tambahkan lewat UI supaya tersimpan di
  * browser, bukan ikut masuk repo. Kalau daftar ini sudah usang, tombol
@@ -125,28 +126,35 @@ export const SEED_PRIORITIES = {
  * tanpa menyentuh entri buatan Anda sendiri.
  */
 export const SEED_EVENTS = [
-  { name:'NTE 1.3 rilis — Rising from the Moonlit Fog (Zankou)', game:'nte',      date:'2026-08-19' },
-  { name:'WuWa 3.6 rilis — Qingxiao + rerun Denia',              game:'wuwa',     date:'2026-08-20' },
-  { name:'HSR 4.5 rilis — Robin Summeretto (server Asia)',       game:'hsr',      date:'2026-08-26' },
-  { name:'⚠️ Endfield: banner Liino BERAKHIR',                   game:'endfield', date:'2026-08-30' },
-  { name:'⚠️ Genshin 7.0 Fase 1 BERAKHIR — Odette & Arlecchino', game:'genshin',  date:'2026-09-01' },
-  { name:'Endfield 1.5 rilis — Si, Feranmut Proxy (±)',          game:'endfield', date:'2026-09-02' },
-  { name:'NTE 1.3 Fase 2 — Linko',                               game:'nte',      date:'2026-09-09' },
-  { name:'ZZZ 3.2 rilis — Claret',                               game:'zzz',      date:'2026-09-09' },
-  { name:'WuWa 3.6 Fase 2 — Jingran (±)',                        game:'wuwa',     date:'2026-09-10' },
-  { name:'HSR 4.5 Fase 2 — Aventurine Waveflair',                game:'hsr',      date:'2026-09-12' },
-  { name:'⚠️ Genshin 7.0 Fase 2 BERAKHIR — Flins & Ineffa',      game:'genshin',  date:'2026-09-22' },
-  { name:'⚠️ NTE 1.3 BERAKHIR',                                  game:'nte',      date:'2026-09-30' },
-  { name:'⚠️ ZZZ 3.2 Fase 1 BERAKHIR',                           game:'zzz',      date:'2026-09-30' },
+  { name:'Endfield 1.5 rilis — Dreamscape of Wind and Snow (Typhoeus)', game:'endfield', date:'2026-09-02' },
+  { name:'NTE 1.3 Fase 2 — Linko',                                      game:'nte',      date:'2026-09-09' },
+  { name:'ZZZ 3.2 rilis — Claret',                                      game:'zzz',      date:'2026-09-09' },
+  { name:'WuWa 3.6 Fase 2 — Jingran (±)',                               game:'wuwa',     date:'2026-09-10' },
+  { name:'HSR 4.5 Fase 2 — Aventurine Waveflair',                       game:'hsr',      date:'2026-09-12' },
+  { name:'⚠️ Genshin 7.0 Fase 2 BERAKHIR — Flins & Ineffa',            game:'genshin',  date:'2026-09-22' },
+  { name:'Genshin 7.1 rilis — Vesna & Vodyanitsa',                      game:'genshin',  date:'2026-09-23' },
+  { name:'Endfield 1.5 gelombang 2 — peta Suiming + Operator gratis',   game:'endfield', date:'2026-09-24' },
+  { name:'⚠️ HSR 4.5 BERAKHIR',                                         game:'hsr',      date:'2026-09-27' },
+  { name:'HSR 4.6 rilis — Pearl (±)',                                   game:'hsr',      date:'2026-09-29' },
+  { name:'⚠️ Endfield: banner Typhoeus BERAKHIR',                       game:'endfield', date:'2026-09-30' },
+  { name:'⚠️ NTE 1.3 BERAKHIR',                                         game:'nte',      date:'2026-09-30' },
+  { name:'⚠️ WuWa 3.6 BERAKHIR',                                        game:'wuwa',     date:'2026-09-30' },
+  { name:'ZZZ 3.2 Fase 2 — Roxy',                                       game:'zzz',      date:'2026-09-30' },
+  { name:'WuWa 3.7 rilis — Hsin (±)',                                   game:'wuwa',     date:'2026-10-01' },
+  { name:'NTE 1.4 rilis (± belum diumumkan)',                           game:'nte',      date:'2026-10-01' },
+  { name:'Genshin 7.1 Fase 2 (±)',                                      game:'genshin',  date:'2026-10-14' },
+  { name:'ZZZ 3.3 rilis (±)',                                           game:'zzz',      date:'2026-10-21' },
+  { name:'WuWa 3.7 Fase 2 — Suoming (±)',                               game:'wuwa',     date:'2026-10-22' },
+  { name:'⚠️ Genshin 7.1 BERAKHIR (±)',                                 game:'genshin',  date:'2026-11-03' },
 ];
 
 export const SEED_PATCHES = [
-  { game:'nte',      label:'NTE 1.3 — Moonlit Fog',        date:'19 Agu' },
-  { game:'wuwa',     label:'WuWa 3.6 — Qingxiao',          date:'20 Agu' },
-  { game:'hsr',      label:'HSR 4.5 — Robin Summeretto',   date:'26 Agu' },
-  { game:'endfield', label:'Endfield 1.5 — Si',            date:'±2 Sep' },
+  { game:'endfield', label:'Endfield 1.5 — Typhoeus',      date:'2 Sep' },
   { game:'zzz',      label:'ZZZ 3.2 — Claret',             date:'9 Sep' },
-  { game:'genshin',  label:'Genshin 7.1',                  date:'±23 Sep' },
+  { game:'genshin',  label:'Genshin 7.1 — Vesna',          date:'23 Sep' },
+  { game:'hsr',      label:'HSR 4.6 — Pearl',              date:'±29 Sep' },
+  { game:'nte',      label:'NTE 1.4',                      date:'±1 Okt' },
+  { game:'wuwa',     label:'WuWa 3.7 — Hsin',              date:'±1 Okt' },
 ];
 
 // Posisi story diisi sendiri lewat ◈ 06 — sengaja dikosongkan agar progres
